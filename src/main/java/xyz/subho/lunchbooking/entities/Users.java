@@ -1,8 +1,12 @@
 package xyz.subho.lunchbooking.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
@@ -11,6 +15,7 @@ import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -46,6 +51,9 @@ public class Users extends BaseEntity {
   @Column(columnDefinition = "tinyint")
   private Meals mealPrefernce;
 
+  @Column(name = "enabled", columnDefinition = "boolean default true", nullable = false)
+  private boolean enabled = true;
+
   @Basic private Long loginDt;
 
   @ManyToMany(fetch = FetchType.EAGER)
@@ -54,6 +62,10 @@ public class Users extends BaseEntity {
       joinColumns = @JoinColumn(name = "user_id"),
       inverseJoinColumns = @JoinColumn(name = "role_id"))
   private Set<Roles> roles = new HashSet<>();
+
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @JsonIgnore
+  private List<Bookings> bookings = new ArrayList<>();
 
   @Column(name = "secured")
   private Boolean secured;

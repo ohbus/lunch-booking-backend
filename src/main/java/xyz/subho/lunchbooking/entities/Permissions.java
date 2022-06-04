@@ -26,8 +26,7 @@ public class Permissions extends BaseEntity {
   @Column(name = "name", nullable = false)
   private String name;
 
-  // enabled as default
-  @Column(name = "enabled")
+  @Column(name = "enabled", columnDefinition = "boolean default true", nullable = false)
   private boolean enabled = true;
 
   @Column(name = "note")
