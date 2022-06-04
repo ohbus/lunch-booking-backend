@@ -2,10 +2,9 @@ package xyz.subho.lunchbooking.exceptions;
 
 public class UserIsSecuredException extends RuntimeException {
 
-	private static final long serialVersionUID = 9147910102443102805L;
+  private static final long serialVersionUID = 9147910102443102805L;
 
-	public UserIsSecuredException(String message) {
-        super(message);
-    }
-
+  public UserIsSecuredException(String message) {
+    super(message);
+  }
 }

@@ -4,7 +4,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
 import xyz.subho.lunchbooking.exceptions.ErrorDetails;
 import xyz.subho.lunchbooking.exceptions.InvalidEmailException;
 import xyz.subho.lunchbooking.exceptions.InvalidLoginException;
@@ -23,33 +22,34 @@ import xyz.subho.lunchbooking.exceptions.UserNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandlerController {
-	
-	@ExceptionHandler({
-		InvalidEmailException.class,
-		InvalidUserDataException.class,
-        InvalidUserIdentifierException.class,
-        InvalidRoleIdentifierException.class,
-        InvalidUsernameException.class,
-        InvalidLoginException.class,
-        InvalidPermissionDataException.class,
-        InvalidRoleDataException.class,
-        RoleInUseException.class,
-        PermissionInUseException.class})
-	public ResponseEntity<ErrorDetails> handleAsBadRequest(RuntimeException ex) {
-		
-	    ErrorDetails errorDetails = new ErrorDetails(ex.getMessage());
-	    return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
-	}
-	
-	@ExceptionHandler({
-		RoleNotFoundException.class,
-		UserNotFoundException.class,
-		UserIsSecuredException.class,
-	    PermissionNotFoundException.class})
-	public ResponseEntity<ErrorDetails> handleAsNotFound(RuntimeException ex) {
-		
-	    ErrorDetails errorDetails = new ErrorDetails(ex.getMessage());
-	    return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
-	}
 
+  @ExceptionHandler({
+    InvalidEmailException.class,
+    InvalidUserDataException.class,
+    InvalidUserIdentifierException.class,
+    InvalidRoleIdentifierException.class,
+    InvalidUsernameException.class,
+    InvalidLoginException.class,
+    InvalidPermissionDataException.class,
+    InvalidRoleDataException.class,
+    RoleInUseException.class,
+    PermissionInUseException.class
+  })
+  public ResponseEntity<ErrorDetails> handleAsBadRequest(RuntimeException ex) {
+
+    ErrorDetails errorDetails = new ErrorDetails(ex.getMessage());
+    return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler({
+    RoleNotFoundException.class,
+    UserNotFoundException.class,
+    UserIsSecuredException.class,
+    PermissionNotFoundException.class
+  })
+  public ResponseEntity<ErrorDetails> handleAsNotFound(RuntimeException ex) {
+
+    ErrorDetails errorDetails = new ErrorDetails(ex.getMessage());
+    return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+  }
 }
