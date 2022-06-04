@@ -24,6 +24,9 @@
 		<license-maven-plugin.version>3.0</license-maven-plugin.version>
 		<jsonwebtoken.version>0.9.1</jsonwebtoken.version>
 		<jacoco.version>0.8.6</jacoco.version>
+		<sonar.projectKey>ohbus_lunch-booking-backend</sonar.projectKey>
+		<sonar.organization>ohbus</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
 	<dependencies>
 		<dependency>
