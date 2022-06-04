@@ -98,5 +98,5 @@ jobs:
     
     - name: Check Code Formatting
       run: |
-        ./mvnw -e spotless:check
-        echo "Run the command './mvnw spotless:apply' to fix Java formatting if this job fails or Build with Maven"
+        mvn -e spotless:check
+        echo "Run the command 'mvn spotless:apply' to fix Java formatting if this job fails or Build with Maven"

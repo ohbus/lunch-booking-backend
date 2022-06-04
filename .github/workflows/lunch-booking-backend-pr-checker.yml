@@ -45,7 +45,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
             if [ -n "${{ github.event.pull_request.number }}" ]; then
-              MAVEN_OPTS="-Xmx4096m" xvfb-run ./mvnw -B clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+              MAVEN_OPTS="-Xmx4096m" mvn -B clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
                  -Dsonar.pullrequest.key=${{ github.event.pull_request.number }} \
                  -Dsonar.pullrequest.branch=${{ steps.extract_branch.outputs.branch }} \
                  -Dsonar.pullrequest.base=master
@@ -91,5 +91,5 @@ jobs:
     
     - name: Check Code Formatting
       run: |
-        ./mvnw -e spotless:check
-        echo "Run the command './mvnw spotless:apply' to fix Java formatting if this job fails or Build with Maven"
+        mvn -e spotless:check
+        echo "Run the command 'mvn spotless:apply' to fix Java formatting if this job fails or Build with Maven"
