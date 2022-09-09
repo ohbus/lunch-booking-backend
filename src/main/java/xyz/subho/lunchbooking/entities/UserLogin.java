@@ -32,7 +32,7 @@ import lombok.With;
 @NoArgsConstructor
 @With
 @EqualsAndHashCode(callSuper = true)
-public class Users extends BaseEntity {
+public class UserLogin extends BaseEntity {
 
   // username is the email ID
   @Column(name = "username", nullable = false, unique = true, updatable = false)
