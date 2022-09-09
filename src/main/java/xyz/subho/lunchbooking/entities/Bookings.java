@@ -1,11 +1,20 @@
 package xyz.subho.lunchbooking.entities;
 
+import java.io.Serializable;
 import java.time.LocalDate;
-import javax.persistence.Column;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,16 +28,25 @@ import lombok.With;
 @NoArgsConstructor
 @With
 @EqualsAndHashCode(callSuper = true)
-public class Bookings extends BaseEntity {
+public class Bookings extends BaseEntity implements Serializable {
+
+  private static final long serialVersionUID = -9138314713309636521L;
 
   @ManyToOne
   @JoinColumn(name = "users_id", updatable = false, nullable = false)
-  private Users user;
+  private UserMetadata user;
 
-  @Column private String mealPrefernce;
-
-  @Column private LocalDate date;
-
-  @Column(name = "claimed", columnDefinition = "boolean default false", nullable = false)
-  private boolean claimed = false;
+  private LocalDate date;
+  
+  private Long claimedAt;
+  
+  private Long cancelledAt;
+  
+  @OneToMany(
+	      mappedBy = "bookings",
+	      cascade = CascadeType.ALL,
+	      fetch = FetchType.LAZY,
+	      orphanRemoval = true)
+	  @JsonIgnore
+  private List<BookingsMealOptions> bookingsMealOptions = new ArrayList<>();
 }

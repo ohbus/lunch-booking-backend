@@ -1,8 +1,5 @@
 package xyz.subho.lunchbooking.entities;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -15,6 +12,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.With;
+
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,26 +33,40 @@ public class BaseEntity {
   @Column(name = "id")
   private Long id;
 
-  @Basic private Boolean deleted;
+  @Basic
+  @CreatedDate
+  private Long createdAt;
 
-  @Basic private Long createdAt;
+  @Basic
+  @CreatedBy
+  private String createdBy;
 
-  @Basic private String createdBy;
+  @Basic
+  @LastModifiedDate
+  private Long updatedAt;
 
-  @Basic private Long updatedAt;
-
-  @Basic private String updatedBy;
+  @Basic
+  @LastModifiedBy
+  private String updatedBy;
+  
+  @Basic private Long version = 1L;
+  
+  @Basic private Long deletedAt;
+  
+  @Basic private String deletedBy;
 
   @PrePersist
   public void onCreate() {
     this.createdAt = System.currentTimeMillis();
-    this.createdBy = this.getCurrentUser();
+    this.createdBy = getCurrentUser();
+    this.version = 1L;
   }
 
   @PreUpdate
   public void onUpdate() {
     this.updatedAt = System.currentTimeMillis();
-    this.updatedBy = this.getCurrentUser();
+    this.updatedBy = getCurrentUser();
+    this.version++;
   }
 
   private String getCurrentUser() {
@@ -59,12 +75,9 @@ public class BaseEntity {
         ? authentication.getName()
         : null;
   }
-
-  public LocalDateTime getCreatedTime() {
-    return LocalDateTime.ofInstant(Instant.ofEpochMilli(this.createdAt), ZoneId.systemDefault());
-  }
-
-  public LocalDateTime getUpdatedTime() {
-    return LocalDateTime.ofInstant(Instant.ofEpochMilli(this.updatedAt), ZoneId.systemDefault());
+  
+  public void delete() {
+	  this.deletedAt = System.currentTimeMillis();
+	  this.deletedBy = getCurrentUser();
   }
 }

@@ -1,6 +1,5 @@
 package xyz.subho.lunchbooking.services;
 
-
 public interface EncryptionService {
 	
 	public static final String ALGORITHM = "PBKDF2WithHmacSHA1";

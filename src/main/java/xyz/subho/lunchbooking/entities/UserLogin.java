@@ -1,22 +1,22 @@
 package xyz.subho.lunchbooking.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.util.ArrayList;
+import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,29 +32,29 @@ import lombok.With;
 @NoArgsConstructor
 @With
 @EqualsAndHashCode(callSuper = true)
-public class UserLogin extends BaseEntity {
+public class UserLogin extends BaseEntity implements UserDetails, Serializable {
 
-  // username is the email ID
-  @Column(name = "username", nullable = false, unique = true, updatable = false)
+  private static final long serialVersionUID = -1484069631072335374L;
+
+// username is the email ID
+  @Column(name = "username", nullable = false, unique = true, updatable = false, length = 100)
   private String username;
 
-  @Column(name = "password", nullable = false)
+  @Column(name = "password", nullable = false, length = 130)
   private String password;
+  
+  @Column(name = "salt", nullable = false)
+  private String salt;
 
-  @Column(name = "name", nullable = false)
-  private String name;
+  @Column(name = "locked", columnDefinition = "boolean default false", nullable = false)
+  private boolean locked = false;
+  
+  @Column(name = "secured")
+  private Boolean secured = false;
 
-  @Column(name = "surname", nullable = false)
-  private String surname;
-
-  @Enumerated
-  @Column(columnDefinition = "tinyint")
-  private Meals mealPrefernce;
-
-  @Column(name = "enabled", columnDefinition = "boolean default true", nullable = false)
-  private boolean enabled = true;
-
-  @Basic private Long loginDt;
+  @Basic private Long currentLoginDt;
+  
+  @Basic private Long lastLoginDt;
 
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
@@ -63,10 +63,34 @@ public class UserLogin extends BaseEntity {
       inverseJoinColumns = @JoinColumn(name = "role_id"))
   private Set<Roles> roles = new HashSet<>();
 
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-  @JsonIgnore
-  private List<Bookings> bookings = new ArrayList<>();
 
-  @Column(name = "secured")
-  private Boolean secured;
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public boolean isAccountNonExpired() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	@Override
+	public boolean isAccountNonLocked() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	@Override
+	public boolean isCredentialsNonExpired() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

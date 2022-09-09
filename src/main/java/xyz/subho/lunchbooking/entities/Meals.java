@@ -1,30 +1,72 @@
 package xyz.subho.lunchbooking.entities;
 
-import xyz.subho.lunchbooking.exceptions.InvalidMealTypeException;
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
-public enum Meals {
-  NON_VEG(1),
-  VEG(2);
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Index;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
-  private int meal;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-  Meals(int mealType) {
-    this.meal = mealType;
-  }
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.With;
 
-  public int getGender() {
-    return meal;
-  }
+@Entity
+@Table(
+    name = "meals",
+    indexes = {
+    		@Index(columnList = "name"),
+    		@Index(columnList = "date")
+    })
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@With
+@EqualsAndHashCode(callSuper = true)
+public class Meals extends BaseEntity implements Serializable {
 
-  public static Meals getValidGender(String mealType) {
-    Meals meal;
-    try {
-      meal = Meals.valueOf(mealType);
-    } catch (IllegalArgumentException ex) {
-      throw new InvalidMealTypeException(
-          String.format(
-              "Invalid meal string %s. ONLY SUPPORTED: NON_VEG or VEG strings", mealType));
-    }
-    return meal;
-  }
+	private static final long serialVersionUID = -657646258883261176L;
+	
+	@Column(length = 30, nullable = false)
+	private String name;
+	
+	private LocalDate date;
+	
+	private Long activatedAt;
+	
+	@OneToMany(mappedBy = "meals", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	  @JsonIgnore
+	private List<MealOptions> mealOptions = new ArrayList<>();
+	
+	public boolean activate() {
+		activatedAt = System.currentTimeMillis();
+		return Objects.nonNull(activatedAt);
+	}
+	
+	public boolean deactivate() {
+		activatedAt = null;
+		return Objects.nonNull(activatedAt);
+	}
+	
+	public int addMealOptions(MealOptions mealOptions) {
+		this.mealOptions.add(mealOptions);
+		return this.mealOptions.size();
+	}
+	
+	public int removeMealOptions(MealOptions mealOptions) {
+		this.mealOptions.removeIf(option -> option.getId().equals(mealOptions.getId()));
+		return this.mealOptions.size();
+	}
+  
 }

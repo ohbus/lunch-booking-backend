@@ -2,6 +2,7 @@ package xyz.subho.lunchbooking.entities;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,7 +11,10 @@ import lombok.NoArgsConstructor;
 import lombok.With;
 
 @Entity
-@Table(name = "permissions")
+@Table(name = "permissions",
+indexes = {
+		@Index(columnList = "name")
+})
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,9 +22,9 @@ import lombok.With;
 @EqualsAndHashCode(callSuper = true)
 public class Permissions extends BaseEntity {
 
-  public Permissions(Long id, String permissionName) {
+  public Permissions(Long id, String name) {
     this.setId(id);
-    this.name = permissionName;
+    this.name = name;
   }
 
   @Column(name = "name", nullable = false)
