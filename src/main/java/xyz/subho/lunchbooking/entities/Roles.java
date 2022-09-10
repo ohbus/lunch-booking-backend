@@ -1,5 +1,6 @@
 package xyz.subho.lunchbooking.entities;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
@@ -22,14 +23,16 @@ import lombok.With;
 @NoArgsConstructor
 @With
 @EqualsAndHashCode(callSuper = true)
-public class Roles extends BaseEntity {
+public class Roles extends BaseEntity implements Serializable {
+
+  private static final long serialVersionUID = 1466436830227018993L;
 
   public static final long ADMINISTRATOR = 1;
   public static final long MANAGER = 2;
   public static final long EMPLOYEE = 3;
   public static final long CATERER = 4;
 
-  @Column(name = "role", nullable = false)
+  @Column(name = "role", nullable = false, length = 32)
   private String role;
 
   public Roles(Long id, String role) {

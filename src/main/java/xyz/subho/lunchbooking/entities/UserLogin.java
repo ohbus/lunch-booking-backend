@@ -3,6 +3,7 @@ package xyz.subho.lunchbooking.entities;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -13,15 +14,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.With;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Table(
@@ -36,25 +35,34 @@ public class UserLogin extends BaseEntity implements UserDetails, Serializable {
 
   private static final long serialVersionUID = -1484069631072335374L;
 
-// username is the email ID
-  @Column(name = "username", nullable = false, unique = true, updatable = false, length = 100)
+  // User Name is the Email ID
+  @Column(name = "username", nullable = false, unique = true, updatable = false, length = 128)
   private String username;
 
-  @Column(name = "password", nullable = false, length = 130)
+  @Column(name = "password", nullable = false)
   private String password;
-  
-  @Column(name = "salt", nullable = false)
+
+  @Column(name = "salt", nullable = false, length = 128)
   private String salt;
 
-  @Column(name = "locked", columnDefinition = "boolean default false", nullable = false)
+  @Column(columnDefinition = "boolean default false", nullable = false)
+  private boolean expired = false;
+
+  @Column(columnDefinition = "boolean default false", nullable = false)
   private boolean locked = false;
-  
-  @Column(name = "secured")
+
+  @Column(columnDefinition = "boolean default false", nullable = false)
+  private boolean credentialExpired = false;
+
+  @Column(columnDefinition = "boolean default true", nullable = false)
+  private boolean enabled = true;
+
+  @Column(columnDefinition = "boolean default false", nullable = false)
   private Boolean secured = false;
 
-  @Basic private Long currentLoginDt;
-  
-  @Basic private Long lastLoginDt;
+  @Basic private Long currentLogin;
+
+  @Basic private Long lastLogin;
 
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
@@ -63,34 +71,41 @@ public class UserLogin extends BaseEntity implements UserDetails, Serializable {
       inverseJoinColumns = @JoinColumn(name = "role_id"))
   private Set<Roles> roles = new HashSet<>();
 
+  public long makeNewLogin() {
 
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
-	public boolean isAccountNonExpired() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	
-	@Override
-	public boolean isAccountNonLocked() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	
-	@Override
-	public boolean isCredentialsNonExpired() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    if (Objects.isNull(currentLogin)) {
+      currentLogin = System.currentTimeMillis();
+    } else {
+      lastLogin = currentLogin;
+      currentLogin = System.currentTimeMillis();
+    }
+    return Objects.isNull(lastLogin) ? 0L : lastLogin;
+  }
 
-	@Override
-	public boolean isEnabled() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+  @Override
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    Set<Permissions> permission = new HashSet<>();
+    this.roles.forEach(role -> permission.addAll(role.getPermissions()));
+    return permission;
+  }
+
+  @Override
+  public boolean isAccountNonExpired() {
+    return !expired;
+  }
+
+  @Override
+  public boolean isAccountNonLocked() {
+    return !locked;
+  }
+
+  @Override
+  public boolean isCredentialsNonExpired() {
+    return !credentialExpired;
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return enabled;
+  }
 }

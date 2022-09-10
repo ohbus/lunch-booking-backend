@@ -1,18 +1,17 @@
 package xyz.subho.lunchbooking.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,29 +22,36 @@ import lombok.With;
 @Table(
     name = "users",
     indexes = {
-    		@Index(columnList = "firstName"),
-    		@Index(columnList = "lastName"),
-    		@Index(columnList = "emailId")
+      @Index(columnList = "firstName"),
+      @Index(columnList = "lastName"),
+      @Index(columnList = "emailId"),
+      @Index(columnList = "mobile")
     })
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @With
 @EqualsAndHashCode(callSuper = true)
-public class UserMetadata 
-	extends BaseEntity 
-		implements Serializable {
-	
-	private static final long serialVersionUID = -8209621126460711059L;
+public class UserMetadata extends BaseEntity implements Serializable {
 
-	private String firstName;
-	
-	private String lastName;
-	
-	private String emailId;
+  private static final long serialVersionUID = -8209621126460711059L;
 
-	  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	  @JsonIgnore
-	  private List<Bookings> bookings = new ArrayList<>();
-	  
+  @Column(length = 50, nullable = false)
+  @NotNull
+  private String firstName;
+
+  @Column(length = 50, nullable = false)
+  @NotNull
+  private String lastName;
+
+  @Column(length = 100, nullable = false, unique = true)
+  @NotNull
+  private String emailId;
+
+  @Column(length = 15, unique = true)
+  private String mobile;
+
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @JsonIgnore
+  private List<Bookings> bookings = new ArrayList<>();
 }

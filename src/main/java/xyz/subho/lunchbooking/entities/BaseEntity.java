@@ -12,7 +12,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.With;
-
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -33,27 +32,24 @@ public class BaseEntity {
   @Column(name = "id")
   private Long id;
 
-  @Basic
-  @CreatedDate
-  private Long createdAt;
+  @Basic @CreatedDate private Long createdAt;
 
-  @Basic
+  @Column(length = 100)
   @CreatedBy
   private String createdBy;
 
-  @Basic
-  @LastModifiedDate
-  private Long updatedAt;
+  @Basic @LastModifiedDate private Long updatedAt;
 
-  @Basic
+  @Column(length = 100)
   @LastModifiedBy
   private String updatedBy;
-  
+
   @Basic private Long version = 1L;
-  
+
   @Basic private Long deletedAt;
-  
-  @Basic private String deletedBy;
+
+  @Column(length = 100)
+  private String deletedBy;
 
   @PrePersist
   public void onCreate() {
@@ -75,9 +71,9 @@ public class BaseEntity {
         ? authentication.getName()
         : null;
   }
-  
+
   public void delete() {
-	  this.deletedAt = System.currentTimeMillis();
-	  this.deletedBy = getCurrentUser();
+    this.deletedAt = System.currentTimeMillis();
+    this.deletedBy = getCurrentUser();
   }
 }
