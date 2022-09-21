@@ -18,7 +18,7 @@ public class EncryptionServiceImpl implements EncryptionService {
   private static final SecureRandom RANDOM = new SecureRandom();
   private static final String ALPHABET =
       "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-  private static final int ITERATIONS = 10000;
+  private static final int ITERATIONS = 32768;
 
   @Override
   public String generateSalt(int length) {

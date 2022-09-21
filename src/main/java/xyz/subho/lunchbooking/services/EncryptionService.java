@@ -2,7 +2,7 @@ package xyz.subho.lunchbooking.services;
 
 public interface EncryptionService {
 
-  public static final String ALGORITHM = "PBKDF2WithHmacSHA1";
+  public static final String ALGORITHM = "PBKDF2WithHmacSHA512";
   public static final int KEY_LENGTH = 256;
 
   public String generateSalt(int length);
