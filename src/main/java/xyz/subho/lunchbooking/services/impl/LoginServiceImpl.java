@@ -109,8 +109,6 @@ public class LoginServiceImpl implements LoginService {
       var userMetadata = getUserByEmail(userLogin.getUsername());
       log.debug("Fetched User Details for email:{}", userMetadata.getEmailId());
 
-      // TODO: JWT based Token Creation
-
       log.info("Login Successful for Username:{}", userMetadata.getEmailId());
       return loginMapper.transform(userMetadata).withLastLogin(userLogin.makeNewLogin());
     } else {

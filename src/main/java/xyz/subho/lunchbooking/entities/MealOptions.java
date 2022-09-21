@@ -3,7 +3,9 @@ package xyz.subho.lunchbooking.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -54,18 +56,28 @@ public class MealOptions extends BaseEntity implements Serializable {
   private List<BookingsMealOptions> bookingsMealOptions = new ArrayList<>();
 
   public void addBookings(List<Bookings> bookings) {
-    bookings.forEach(
-        booking -> {
-          var mapping = new BookingsMealOptions(booking, this);
-          this.bookingsMealOptions.add(mapping);
-          this.count++;
-        });
+    if (Objects.nonNull(bookings))
+      bookings.forEach(
+          booking -> {
+            var mapping = new BookingsMealOptions(booking, this);
+            this.bookingsMealOptions.add(mapping);
+            this.count++;
+          });
+  }
+
+  public void addBooking(Bookings booking) {
+    if (Objects.nonNull(booking)) addBookings(Arrays.asList(booking));
   }
 
   public void removeBooking(Bookings booking) {
+    if (Objects.nonNull(booking) && Objects.nonNull(booking.getId()))
+      removeBookingById(booking.getId());
+  }
+
+  public void removeBookingById(long bookingId) {
     List<BookingsMealOptions> toBeDeleted =
         bookingsMealOptions.stream()
-            .filter(mapping -> mapping.getId().getBookingId().equals(booking.getId()))
+            .filter(mapping -> mapping.getId().getBookingId().equals(bookingId))
             .collect(Collectors.toList());
     bookingsMealOptions.removeAll(toBeDeleted);
     count -= toBeDeleted.size();

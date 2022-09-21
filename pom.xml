@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.7.0</version>
+		<version>2.7.3</version>
 		<relativePath/>
 		<!-- lookup parent from repository -->
 	</parent>
@@ -17,13 +17,13 @@
 	<name>Lunch Booking</name>
 	<description>Lunch Booking REST Application</description>
 	<properties>
-		<java.version>11</java.version>
+		<java.version>17</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spotless.plugin.version>2.8.1</spotless.plugin.version>
-		<google-java-format.version>1.9</google-java-format.version>
-		<license-maven-plugin.version>3.0</license-maven-plugin.version>
-		<jsonwebtoken.version>0.9.1</jsonwebtoken.version>
-		<jacoco.version>0.8.6</jacoco.version>
+		<spotless.plugin.version>2.23.0</spotless.plugin.version>
+		<google-java-format.version>1.15.0</google-java-format.version>
+		<license-maven-plugin.version>4.1</license-maven-plugin.version>
+		<auth0-jwt.version>4.0.0</auth0-jwt.version>
+		<jacoco.version>0.8.8</jacoco.version>
 		<sonar.projectKey>ohbus_lunch-booking-backend</sonar.projectKey>
 		<sonar.organization>ohbus</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
@@ -61,6 +61,11 @@
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
+			<groupId>com.auth0</groupId>
+			<artifactId>java-jwt</artifactId>
+			<version>${auth0-jwt.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<scope>runtime</scope>
@@ -76,10 +81,10 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-test</artifactId>
-			<scope>test</scope>
-		</dependency>
+	      <groupId>org.springframework.security</groupId>
+	      <artifactId>spring-security-test</artifactId>
+	      <scope>test</scope>
+	    </dependency>
 	</dependencies>
 	<build>
 		<plugins>

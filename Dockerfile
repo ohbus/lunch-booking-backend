@@ -1,5 +1,4 @@
-# Use latest openjdk:11-jre-slim image as the base
-FROM openjdk:11-jre-slim
+FROM amazoncorretto:17
 
 LABEL maintainer="Subhrodip Mohanta <hello@subho.xyz>"
 LABEL artifact="lunch-booking-backend"
