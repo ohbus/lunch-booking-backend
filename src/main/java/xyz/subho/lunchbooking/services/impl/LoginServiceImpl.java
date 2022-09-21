@@ -108,6 +108,8 @@ public class LoginServiceImpl implements LoginService {
 
       var userMetadata = getUserByEmail(userLogin.getUsername());
       log.debug("Fetched User Details for email:{}", userMetadata.getEmailId());
+      
+      
 
       log.info("Login Successful for Username:{}", userMetadata.getEmailId());
       return loginMapper.transform(userMetadata).withLastLogin(userLogin.makeNewLogin());

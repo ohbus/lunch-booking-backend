@@ -24,16 +24,7 @@ import xyz.subho.lunchbooking.exceptions.UserNotFoundException;
 public class GlobalExceptionHandlerController {
 
   @ExceptionHandler({
-    InvalidEmailException.class,
-    InvalidUserDataException.class,
-    InvalidUserIdentifierException.class,
-    InvalidRoleIdentifierException.class,
     InvalidUsernameException.class,
-    InvalidLoginException.class,
-    InvalidPermissionDataException.class,
-    InvalidRoleDataException.class,
-    RoleInUseException.class,
-    PermissionInUseException.class
   })
   public ResponseEntity<ErrorDetails> handleAsBadRequest(RuntimeException ex) {
 
@@ -52,4 +43,21 @@ public class GlobalExceptionHandlerController {
     ErrorDetails errorDetails = new ErrorDetails(ex.getMessage());
     return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
   }
+  
+  @ExceptionHandler({
+	    InvalidEmailException.class,
+	    InvalidUserDataException.class,
+	    InvalidUserIdentifierException.class,
+	    InvalidRoleIdentifierException.class,
+	    InvalidLoginException.class,
+	    InvalidPermissionDataException.class,
+	    InvalidRoleDataException.class,
+	    RoleInUseException.class,
+	    PermissionInUseException.class
+	  })
+	  public ResponseEntity<ErrorDetails> handleAsBadUnauthorized(RuntimeException ex) {
+
+	    ErrorDetails errorDetails = new ErrorDetails(ex.getMessage());
+	    return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
+	  }
 }
