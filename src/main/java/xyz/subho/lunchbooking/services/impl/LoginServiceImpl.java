@@ -19,9 +19,11 @@ import xyz.subho.lunchbooking.mapper.Mapper;
 import xyz.subho.lunchbooking.models.UserLoginRequestModel;
 import xyz.subho.lunchbooking.models.UserLoginResponseModel;
 import xyz.subho.lunchbooking.models.UserRegistrationModel;
+import xyz.subho.lunchbooking.models.UserResponseModel;
 import xyz.subho.lunchbooking.repositories.RolesRepository;
 import xyz.subho.lunchbooking.repositories.UserLoginRepository;
 import xyz.subho.lunchbooking.repositories.UserMetadataRepository;
+import xyz.subho.lunchbooking.security.JwtHelper;
 import xyz.subho.lunchbooking.services.EncryptionService;
 import xyz.subho.lunchbooking.services.LoginService;
 
@@ -39,10 +41,12 @@ public class LoginServiceImpl implements LoginService {
 
   @Autowired
   @Qualifier("UserDetailsMapper")
-  private Mapper<UserMetadata, UserLoginResponseModel> loginMapper;
+  private Mapper<UserMetadata, UserResponseModel> loginMapper;
 
-  @Value("${security.salt.length}")
+  @Value("${app.security.jwt.salt.length}")
   private String saltSize;
+
+  @Autowired private JwtHelper jwtHelper;
 
   @Override
   @Transactional
@@ -108,11 +112,13 @@ public class LoginServiceImpl implements LoginService {
 
       var userMetadata = getUserByEmail(userLogin.getUsername());
       log.debug("Fetched User Details for email:{}", userMetadata.getEmailId());
-      
-      
 
-      log.info("Login Successful for Username:{}", userMetadata.getEmailId());
-      return loginMapper.transform(userMetadata).withLastLogin(userLogin.makeNewLogin());
+      final String jwtToken = jwtHelper.createJwt(userLogin.getUsername(), userLogin);
+      log.trace("JWT:{} issued for username:{}", jwtToken, userMetadata.getEmailId());
+      log.info("Login Successful for Username:{} with JWT", userMetadata.getEmailId());
+      var userResponse =
+          loginMapper.transform(userMetadata).withLastLogin(userLogin.makeNewLogin());
+      return new UserLoginResponseModel(jwtToken, userResponse);
     } else {
       log.error("Password is Invalid for username:{}", userRequest.getUsername());
       throw new InvalidLoginException(

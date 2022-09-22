@@ -23,8 +23,7 @@ public class EncryptionServiceImpl implements EncryptionService {
   @Override
   public String generateSalt(int length) {
     StringBuilder saltStr = new StringBuilder(length);
-    while (length-- > 0)
-    	saltStr.append(ALPHABET.charAt(RANDOM.nextInt(ALPHABET.length())));
+    while (length-- > 0) saltStr.append(ALPHABET.charAt(RANDOM.nextInt(ALPHABET.length())));
     return new String(saltStr);
   }
 
