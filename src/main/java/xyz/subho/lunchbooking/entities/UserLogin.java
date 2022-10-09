@@ -24,7 +24,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Table(
-    name = "users",
+    name = "users_login",
     indexes = {@Index(columnList = "username")})
 @Data
 @AllArgsConstructor
@@ -42,7 +42,7 @@ public class UserLogin extends BaseEntity implements UserDetails, Serializable {
   @Column(name = "password", nullable = false)
   private String password;
 
-  @Column(name = "salt", nullable = false, length = 128)
+  @Column(name = "salt", nullable = false, length = 256)
   private String salt;
 
   @Column(columnDefinition = "boolean default false", nullable = false)

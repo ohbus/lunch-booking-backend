@@ -22,6 +22,5 @@ public class LoginController {
     log.debug("Initializing User Regisration for:{}", user.getEmailId());
     loginService.createUser(user);
     log.debug("Completed User Registration for:{}", user.getEmailId());
-    ;
   }
 }
