@@ -3,9 +3,9 @@ package xyz.subho.lunchbooking.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -43,7 +43,7 @@ public class Meals extends BaseEntity implements Serializable {
 
   @OneToMany(mappedBy = "meals", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JsonIgnore
-  private List<MealOptions> mealOptions = new ArrayList<>();
+  private Set<MealOptions> mealOptions = new HashSet<>();
 
   public boolean activate() {
     activatedAt = System.currentTimeMillis();

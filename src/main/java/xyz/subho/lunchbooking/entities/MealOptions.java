@@ -2,10 +2,11 @@ package xyz.subho.lunchbooking.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -53,7 +54,7 @@ public class MealOptions extends BaseEntity implements Serializable {
       fetch = FetchType.LAZY,
       orphanRemoval = true)
   @JsonIgnore
-  private List<BookingsMealOptions> bookingsMealOptions = new ArrayList<>();
+  private Set<BookingsMealOptions> bookingsMealOptions = new HashSet<>();
 
   public void addBookings(List<Bookings> bookings) {
     if (Objects.nonNull(bookings))
@@ -75,10 +76,10 @@ public class MealOptions extends BaseEntity implements Serializable {
   }
 
   public void removeBookingById(long bookingId) {
-    List<BookingsMealOptions> toBeDeleted =
+    Set<BookingsMealOptions> toBeDeleted =
         bookingsMealOptions.stream()
             .filter(mapping -> mapping.getId().getBookingId().equals(bookingId))
-            .collect(Collectors.toList());
+            .collect(Collectors.toSet());
     bookingsMealOptions.removeAll(toBeDeleted);
     count -= toBeDeleted.size();
   }

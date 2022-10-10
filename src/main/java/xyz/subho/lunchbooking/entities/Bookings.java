@@ -3,8 +3,8 @@ package xyz.subho.lunchbooking.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -47,5 +47,5 @@ public class Bookings extends BaseEntity implements Serializable {
       fetch = FetchType.LAZY,
       orphanRemoval = true)
   @JsonIgnore
-  private List<BookingsMealOptions> bookingsMealOptions = new ArrayList<>();
+  private Set<BookingsMealOptions> bookingsMealOptions = new HashSet<>();
 }

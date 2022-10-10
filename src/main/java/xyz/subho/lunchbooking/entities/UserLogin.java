@@ -13,6 +13,8 @@ import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.MapsId;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,7 +26,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Table(
-    name = "users",
+    name = "users_login",
     indexes = {@Index(columnList = "username")})
 @Data
 @AllArgsConstructor
@@ -38,6 +40,11 @@ public class UserLogin extends BaseEntity implements UserDetails, Serializable {
   // User Name is the Email ID
   @Column(name = "username", nullable = false, unique = true, updatable = false, length = 128)
   private String username;
+
+  @OneToOne
+  @MapsId
+  @JoinColumn(name = "id")
+  private UserMetadata user;
 
   @Column(name = "password", nullable = false)
   private String password;

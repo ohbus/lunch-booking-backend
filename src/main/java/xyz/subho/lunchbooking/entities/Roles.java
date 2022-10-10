@@ -1,8 +1,8 @@
 package xyz.subho.lunchbooking.entities;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -45,5 +45,5 @@ public class Roles extends BaseEntity implements Serializable {
       name = "permissions_roles",
       joinColumns = @JoinColumn(name = "role_id"),
       inverseJoinColumns = @JoinColumn(name = "permission_id"))
-  private List<Permissions> permissions = new ArrayList<>();
+  private Set<Permissions> permissions = new HashSet<>();
 }

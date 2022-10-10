@@ -9,8 +9,10 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import xyz.subho.lunchbooking.entities.Roles;
 import xyz.subho.lunchbooking.entities.UserLogin;
 
 @Component
@@ -36,9 +38,9 @@ public class JwtHelper {
   }
 
   public String createJwt(String subject, UserLogin user) {
-
     Map<String, String> claims = new HashMap<>();
-
+    claims.put(
+        "roles", user.getRoles().stream().map(Roles::getRole).collect(Collectors.joining(" ")));
     return createJwtForClaims(subject, claims);
   }
 

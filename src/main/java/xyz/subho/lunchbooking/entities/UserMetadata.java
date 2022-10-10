@@ -2,8 +2,8 @@ package xyz.subho.lunchbooking.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,10 +22,10 @@ import lombok.With;
 @Table(
     name = "users",
     indexes = {
-      @Index(columnList = "firstName"),
-      @Index(columnList = "lastName"),
-      @Index(columnList = "emailId"),
-      @Index(columnList = "mobile")
+      @Index(columnList = "firstName", name = "firstName"),
+      @Index(columnList = "lastName", name = "lastName"),
+      @Index(columnList = "emailId", name = "emailId"),
+      @Index(columnList = "mobile", name = "mobile")
     })
 @Data
 @AllArgsConstructor
@@ -53,5 +53,5 @@ public class UserMetadata extends BaseEntity implements Serializable {
 
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JsonIgnore
-  private List<Bookings> bookings = new ArrayList<>();
+  private Set<Bookings> bookings = new HashSet<>();
 }

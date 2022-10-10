@@ -16,6 +16,7 @@ import xyz.subho.lunchbooking.exceptions.InvalidUsernameException;
 import xyz.subho.lunchbooking.exceptions.RoleNotFoundException;
 import xyz.subho.lunchbooking.exceptions.UserNotFoundException;
 import xyz.subho.lunchbooking.mapper.Mapper;
+import xyz.subho.lunchbooking.models.UserChangePasswordRequestModel;
 import xyz.subho.lunchbooking.models.UserLoginRequestModel;
 import xyz.subho.lunchbooking.models.UserLoginResponseModel;
 import xyz.subho.lunchbooking.models.UserRegistrationModel;
@@ -57,15 +58,7 @@ public class LoginServiceImpl implements LoginService {
       log.error("Email ID already exists for {}", user.getEmailId());
       throw new InvalidUsernameException("Email ID already exists");
     }
-
-    final String salt = encryptionService.generateSalt(Integer.parseInt(saltSize));
-
-    var userLogin =
-        new UserLogin()
-            .withUsername(user.getEmailId())
-            .withPassword(encryptionService.encrypt(user.getPassword(), salt))
-            .withSalt(salt);
-
+    
     var userDetails =
         new UserMetadata()
             .withFirstName(user.getFirstName())
@@ -73,19 +66,30 @@ public class LoginServiceImpl implements LoginService {
             .withEmailId(user.getEmailId())
             .withMobile(user.getMobile());
 
-    addUserRole(userLogin, Roles.EMPLOYEE);
-
-    userLogin = loginRepository.save(userLogin);
-    log.debug("Created Login Details for User ID:{}", userLogin.getId());
-
     userDetails = metadataRepository.save(userDetails);
     log.debug("Created User Details for User ID:{}", userDetails.getId());
+    
+    final String salt = encryptionService.generateSalt(Integer.parseInt(saltSize));
+    
+    var userLogin =
+    		new UserLogin()
+    		.withUsername(user.getEmailId())
+    		.withPassword(encryptionService.encrypt(user.getPassword(), salt))
+    		.withSalt(salt);
+    
+    userLogin.setId(userDetails.getId());
+    
+    addUserRole(userLogin, Roles.EMPLOYEE);
+    
+    userLogin = loginRepository.save(userLogin);
+    log.debug("Created Login Details for User ID:{}", userLogin.getId());
   }
 
   private boolean checkIfUserExists(String username) {
     return loginRepository.existsUserLoginByUsername(username);
   }
 
+  @Transactional
   public void addUserRole(UserLogin user, long roleId) {
     var role = getRoleById(roleId);
     user.getRoles().add(role);
@@ -239,5 +243,11 @@ public class LoginServiceImpl implements LoginService {
     log.error("User Metadata NOT found for email:{}", email);
     throw new UserNotFoundException(
         String.format("User Login Metadata NOT found for email:%s", email));
+  }
+
+  @Override
+  public void UserChangePassword(UserChangePasswordRequestModel changePasswordRequest) {
+    // TODO Auto-generated method stub
+
   }
 }
