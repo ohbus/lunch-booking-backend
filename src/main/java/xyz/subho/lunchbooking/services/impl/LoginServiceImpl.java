@@ -58,7 +58,7 @@ public class LoginServiceImpl implements LoginService {
       log.error("Email ID already exists for {}", user.getEmailId());
       throw new InvalidUsernameException("Email ID already exists");
     }
-    
+
     var userDetails =
         new UserMetadata()
             .withFirstName(user.getFirstName())
@@ -68,19 +68,19 @@ public class LoginServiceImpl implements LoginService {
 
     userDetails = metadataRepository.save(userDetails);
     log.debug("Created User Details for User ID:{}", userDetails.getId());
-    
+
     final String salt = encryptionService.generateSalt(Integer.parseInt(saltSize));
-    
+
     var userLogin =
-    		new UserLogin()
-    		.withUsername(user.getEmailId())
-    		.withPassword(encryptionService.encrypt(user.getPassword(), salt))
-    		.withSalt(salt);
-    
+        new UserLogin()
+            .withUsername(user.getEmailId())
+            .withPassword(encryptionService.encrypt(user.getPassword(), salt))
+            .withSalt(salt);
+
     userLogin.setId(userDetails.getId());
-    
+
     addUserRole(userLogin, Roles.EMPLOYEE);
-    
+
     userLogin = loginRepository.save(userLogin);
     log.debug("Created Login Details for User ID:{}", userLogin.getId());
   }
@@ -137,7 +137,7 @@ public class LoginServiceImpl implements LoginService {
     final String msgTemplate = "Username:%s is %s";
     String errorMsg = "";
 
-    if (userLogin.isEnabled()) {
+    if (!userLogin.isEnabled()) {
       errorMsg = String.format(msgTemplate, username, "Not Enabled");
       log.error(errorMsg);
       throw new InvalidLoginException(errorMsg);

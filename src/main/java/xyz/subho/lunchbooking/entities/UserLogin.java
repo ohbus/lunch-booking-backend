@@ -41,11 +41,6 @@ public class UserLogin extends BaseEntity implements UserDetails, Serializable {
   @Column(name = "username", nullable = false, unique = true, updatable = false, length = 128)
   private String username;
 
-  @OneToOne
-  @MapsId
-  @JoinColumn(name = "id")
-  private UserMetadata user;
-
   @Column(name = "password", nullable = false)
   private String password;
 

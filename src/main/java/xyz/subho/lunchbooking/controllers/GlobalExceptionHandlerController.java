@@ -60,4 +60,11 @@ public class GlobalExceptionHandlerController {
     ErrorDetails errorDetails = new ErrorDetails(ex.getMessage());
     return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
   }
+
+  @ExceptionHandler({Exception.class})
+  public ResponseEntity<ErrorDetails> handleEverythingElse(Exception ex) {
+
+    ErrorDetails errorDetails = new ErrorDetails(ex.getMessage());
+    return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
 }

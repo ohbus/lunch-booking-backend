@@ -21,7 +21,7 @@ public class JwtHelper {
   private final RSAPrivateKey privateKey;
   private final RSAPublicKey publicKey;
 
-  @Value("app.security.jwt.token.validity.milliseconds")
+  @Value("${app.security.jwt.token.validity.milliseconds}")
   private String jwtTokenValidity;
 
   public JwtHelper(RSAPrivateKey privateKey, RSAPublicKey publicKey) {
