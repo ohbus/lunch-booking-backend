@@ -40,7 +40,7 @@ public class Roles extends BaseEntity implements Serializable {
     this.role = role;
   }
 
-  @ManyToMany(fetch = FetchType.EAGER)
+  @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "permissions_roles",
       joinColumns = @JoinColumn(name = "role_id"),

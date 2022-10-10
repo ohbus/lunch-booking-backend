@@ -66,7 +66,7 @@ public class UserLogin extends BaseEntity implements UserDetails, Serializable {
 
   @Basic private Long lastLogin;
 
-  @ManyToMany(fetch = FetchType.EAGER)
+  @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(
       name = "users_roles",
       joinColumns = @JoinColumn(name = "user_id"),
