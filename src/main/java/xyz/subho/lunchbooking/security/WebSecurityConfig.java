@@ -36,15 +36,13 @@ public class WebSecurityConfig {
         .authorizeRequests()
         .antMatchers(EndpointPropertyKey.LOGIN_USER_REGISTRATION, EndpointPropertyKey.LOGIN_USER)
         .permitAll()
-        .
         // all other requests need to be authenticated
-        anyRequest()
+        .anyRequest()
         .authenticated()
         .and()
-        .
         // make sure we use stateless session; session won't be used to
         // store user's state.
-        exceptionHandling()
+        .exceptionHandling()
         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
         .and()
         .sessionManagement()

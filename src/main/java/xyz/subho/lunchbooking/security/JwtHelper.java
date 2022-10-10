@@ -55,7 +55,6 @@ public class JwtHelper {
     // Add expiredAt and etc
     return jwtBuilder
         .withIssuedAt(new Date())
-        .withNotBefore(new Date())
         .withExpiresAt(makeValidity())
         .sign(Algorithm.RSA512(publicKey, privateKey));
   }
