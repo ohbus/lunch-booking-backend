@@ -23,7 +23,10 @@ import lombok.With;
 @Entity
 @Table(
     name = "meals",
-    indexes = {@Index(columnList = "name"), @Index(columnList = "date")})
+    indexes = {
+      @Index(columnList = "name", name = "name"),
+      @Index(columnList = "date", name = "date")
+    })
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

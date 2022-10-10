@@ -54,14 +54,14 @@ public class BaseEntity {
   @PrePersist
   public void onCreate() {
     this.createdAt = System.currentTimeMillis();
-    this.createdBy = getCurrentUser();
+    // this.createdBy = getCurrentUser();
     this.version = 1L;
   }
 
   @PreUpdate
   public void onUpdate() {
     this.updatedAt = System.currentTimeMillis();
-    this.updatedBy = getCurrentUser();
+    // this.updatedBy = getCurrentUser();
     this.version++;
   }
 

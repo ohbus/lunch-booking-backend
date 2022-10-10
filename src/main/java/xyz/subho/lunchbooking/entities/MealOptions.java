@@ -27,7 +27,7 @@ import lombok.With;
 @Entity
 @Table(
     name = "meal_options",
-    indexes = {@Index(columnList = "name")})
+    indexes = {@Index(columnList = "name", name = "name")})
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

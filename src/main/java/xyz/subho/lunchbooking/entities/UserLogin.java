@@ -25,7 +25,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Entity
 @Table(
     name = "users_login",
-    indexes = {@Index(columnList = "username")})
+    indexes = {@Index(columnList = "username", name = "username")})
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
