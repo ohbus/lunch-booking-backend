@@ -117,7 +117,7 @@ public class LoginServiceImpl implements LoginService {
       var userMetadata = getUserByEmail(userLogin.getUsername());
       log.debug("Fetched User Details for email:{}", userMetadata.getEmailId());
 
-      final String jwtToken = jwtHelper.createJwt(userLogin.getUsername(), userLogin);
+      final String jwtToken = jwtHelper.createJwt(userLogin);
       log.trace("JWT:{} issued for username:{}", jwtToken, userMetadata.getEmailId());
       log.info("Login Successful for Username:{} with JWT", userMetadata.getEmailId());
       var userResponse =

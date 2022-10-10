@@ -37,11 +37,12 @@ public class JwtHelper {
     return createJwtForClaims(subject, new HashMap<>());
   }
 
-  public String createJwt(String subject, UserLogin user) {
+  public String createJwt(UserLogin user) {
+
     Map<String, String> claims = new HashMap<>();
     claims.put(
         "roles", user.getRoles().stream().map(Roles::getRole).collect(Collectors.joining(" ")));
-    return createJwtForClaims(subject, claims);
+    return createJwtForClaims(user.getUsername(), claims);
   }
 
   public String createJwtForClaims(String subject, Map<String, String> claims) {
