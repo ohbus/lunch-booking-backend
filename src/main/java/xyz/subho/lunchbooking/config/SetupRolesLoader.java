@@ -18,6 +18,7 @@ import xyz.subho.lunchbooking.repositories.RolesRepository;
 
 @Slf4j
 @Component
+@Transactional
 public class SetupRolesLoader implements ApplicationListener<ContextRefreshedEvent> {
 
   @Autowired private PermissionRepository permissionRepository;
@@ -27,7 +28,6 @@ public class SetupRolesLoader implements ApplicationListener<ContextRefreshedEve
   boolean alreadySetup = false;
 
   @Override
-  @Transactional
   public void onApplicationEvent(ContextRefreshedEvent event) {
 
     if (alreadySetup) return;
@@ -47,7 +47,6 @@ public class SetupRolesLoader implements ApplicationListener<ContextRefreshedEve
     return permissionssMap;
   }
 
-  @Transactional
   private Permissions createPermissionsIfNotExists(String name, Field relfectionField) {
 
     Optional<Permissions> permissionOptional = permissionRepository.findByName(name);
@@ -78,7 +77,6 @@ public class SetupRolesLoader implements ApplicationListener<ContextRefreshedEve
     return rolesMap;
   }
 
-  @Transactional
   private Roles createRolessIfNotExists(String role, Field relfectionField) {
 
     Optional<Roles> rolesOptional = rolesRepository.findByRole(role);
