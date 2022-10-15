@@ -6,21 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import xyz.subho.lunchbooking.exceptions.ErrorDetails;
-import xyz.subho.lunchbooking.exceptions.InvalidEmailException;
-import xyz.subho.lunchbooking.exceptions.InvalidLoginException;
-import xyz.subho.lunchbooking.exceptions.InvalidPermissionDataException;
-import xyz.subho.lunchbooking.exceptions.InvalidRoleDataException;
-import xyz.subho.lunchbooking.exceptions.InvalidRoleIdentifierException;
-import xyz.subho.lunchbooking.exceptions.InvalidUserDataException;
-import xyz.subho.lunchbooking.exceptions.InvalidUserIdentifierException;
-import xyz.subho.lunchbooking.exceptions.InvalidUsernameException;
-import xyz.subho.lunchbooking.exceptions.PermissionInUseException;
-import xyz.subho.lunchbooking.exceptions.PermissionNotFoundException;
-import xyz.subho.lunchbooking.exceptions.RoleInUseException;
-import xyz.subho.lunchbooking.exceptions.RoleNotFoundException;
-import xyz.subho.lunchbooking.exceptions.UserIsSecuredException;
-import xyz.subho.lunchbooking.exceptions.UserNotFoundException;
+import xyz.subho.lunchbooking.exceptions.*;
 
 @RestControllerAdvice
 public class GlobalExceptionHandlerController {
@@ -38,7 +24,8 @@ public class GlobalExceptionHandlerController {
     RoleNotFoundException.class,
     UserNotFoundException.class,
     UserIsSecuredException.class,
-    PermissionNotFoundException.class
+    PermissionNotFoundException.class,
+    MealNotFoundException.class
   })
   public ResponseEntity<ErrorDetails> handleAsNotFound(RuntimeException ex) {
 

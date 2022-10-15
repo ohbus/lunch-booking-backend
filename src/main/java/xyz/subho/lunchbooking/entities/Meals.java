@@ -1,24 +1,16 @@
 package xyz.subho.lunchbooking.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
+import org.hibernate.Hibernate;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Index;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.With;
 
 @Entity
 @Table(
@@ -27,11 +19,12 @@ import lombok.With;
       @Index(columnList = "name", name = "name"),
       @Index(columnList = "date", name = "date")
     })
-@Data
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @With
-@EqualsAndHashCode(callSuper = true)
 public class Meals extends BaseEntity implements Serializable {
 
   private static final long serialVersionUID = -657646258883261176L;
@@ -44,8 +37,13 @@ public class Meals extends BaseEntity implements Serializable {
 
   private Long activatedAt;
 
-  @OneToMany(mappedBy = "meals", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @OneToMany(
+      mappedBy = "meals",
+      cascade = CascadeType.ALL,
+      fetch = FetchType.LAZY,
+      orphanRemoval = true)
   @JsonIgnore
+  @ToString.Exclude
   private Set<MealOptions> mealOptions = new HashSet<>();
 
   public boolean isActivated() {
@@ -70,5 +68,18 @@ public class Meals extends BaseEntity implements Serializable {
   public int removeMealOptions(MealOptions mealOptions) {
     this.mealOptions.removeIf(option -> option.getId().equals(mealOptions.getId()));
     return this.mealOptions.size();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+    Meals meals = (Meals) o;
+    return getId() != null && Objects.equals(getId(), meals.getId());
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
   }
 }
