@@ -13,11 +13,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Index;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -38,13 +36,9 @@ public class MealOptions extends BaseEntity implements Serializable {
   private static final long serialVersionUID = -6473537837965565355L;
 
   @Column(length = 30, nullable = false)
-  @NotNull
   private String name;
 
-  @ManyToOne
-  @JoinColumn(name = "meals_id", nullable = false)
-  @NotNull
-  private Meals meals;
+  @ManyToOne private Meals meals;
 
   private Integer count = 0;
 
@@ -55,6 +49,10 @@ public class MealOptions extends BaseEntity implements Serializable {
       orphanRemoval = true)
   @JsonIgnore
   private Set<BookingsMealOptions> bookingsMealOptions = new HashSet<>();
+
+  public MealOptions(String name) {
+    this.name = name;
+  }
 
   public void addBookings(List<Bookings> bookings) {
     if (Objects.nonNull(bookings))

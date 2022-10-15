@@ -86,7 +86,7 @@ public class LoginServiceImpl implements LoginService {
   }
 
   private boolean checkIfUserExists(String username) {
-    return loginRepository.existsUserLoginByUsername(username);
+    return loginRepository.existsByUsername(username);
   }
 
   @Transactional
@@ -187,11 +187,11 @@ public class LoginServiceImpl implements LoginService {
 
     log.debug("Finding user with ID:{}", userId);
     var userLoginOpt = loginRepository.findById(userId);
-    if (!userLoginOpt.isPresent()) {
+    if (userLoginOpt.isEmpty()) {
       log.error("Cannot Find User with ID:{}", userId);
       throw new UserNotFoundException(String.format("Invlaid User ID:%s", userId));
     }
-    log.debug("Found user with ID:%s", userId);
+    log.debug("Found user with ID:{}", userId);
     return userLoginOpt.get();
   }
 

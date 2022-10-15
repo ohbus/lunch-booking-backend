@@ -1,7 +1,9 @@
 package xyz.subho.lunchbooking.controllers;
 
+import javax.validation.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import xyz.subho.lunchbooking.exceptions.ErrorDetails;
@@ -59,6 +61,13 @@ public class GlobalExceptionHandlerController {
 
     ErrorDetails errorDetails = new ErrorDetails(ex.getMessage());
     return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
+  }
+
+  @ExceptionHandler({HttpMessageNotReadableException.class, ValidationException.class})
+  public ResponseEntity<ErrorDetails> handleAsUnpronounceableEntity(Exception ex) {
+
+    ErrorDetails errorDetails = new ErrorDetails(ex.getMessage());
+    return new ResponseEntity<>(errorDetails, HttpStatus.UNPROCESSABLE_ENTITY);
   }
 
   @ExceptionHandler({Exception.class})

@@ -64,7 +64,7 @@ public class UserLogin extends BaseEntity implements UserDetails, Serializable {
 
   @Basic private Long lastLogin;
 
-  @ManyToMany(fetch = FetchType.LAZY)
+  @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
       name = "users_roles",
       joinColumns = @JoinColumn(name = "user_id"),
@@ -85,7 +85,7 @@ public class UserLogin extends BaseEntity implements UserDetails, Serializable {
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     Set<Permissions> permission = new HashSet<>();
-    this.roles.forEach(role -> permission.addAll(role.getPermissions()));
+    roles.forEach(role -> permission.addAll(role.getPermissions()));
     return permission;
   }
 

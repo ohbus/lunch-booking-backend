@@ -8,4 +8,8 @@ public final class EndpointPropertyKey {
 
   public static final String LOGIN_USER_REGISTRATION = "/login/register";
   public static final String LOGIN_USER = "/login";
+
+  public static final String MEAL_CREATE = "/meal/create";
+
+  public static final String BOOKING_CREATE = "/booking/create/{mealOptionId}";
 }

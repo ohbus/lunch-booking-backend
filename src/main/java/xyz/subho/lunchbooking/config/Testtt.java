@@ -18,6 +18,8 @@ public class Testtt {
             .get(Permissions.class.getField("UPDATE_USER"))
             .toString());
 
+    System.out.println(Permissions.class.getFields().length);
+
     List<Field> fields = new ArrayList<>(Arrays.asList(Permissions.class.getFields()));
     fields.forEach(
         field -> {

@@ -6,7 +6,9 @@ import xyz.subho.lunchbooking.entities.UserLogin;
 
 public interface UserLoginRepository extends JpaRepository<UserLogin, Long> {
 
-  public boolean existsUserLoginByUsername(String username);
+  public boolean existsByUsername(String username);
+
+  public long countByUsername(String username);
 
   public Optional<UserLogin> findByUsername(String username);
 }

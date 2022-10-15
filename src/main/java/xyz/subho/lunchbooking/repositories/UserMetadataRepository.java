@@ -1,16 +1,18 @@
 package xyz.subho.lunchbooking.repositories;
 
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.lang.NonNull;
 import xyz.subho.lunchbooking.entities.UserMetadata;
 
 public interface UserMetadataRepository extends JpaRepository<UserMetadata, Long> {
 
-  public Optional<UserMetadata> findByFirstName(String firstName);
+  Optional<UserMetadata> findByEmailId(@NonNull String emailId);
 
-  public Optional<UserMetadata> findByLastName(String lastName);
+  Optional<UserMetadata> findByMobile(@NonNull String mobile);
 
-  public Optional<UserMetadata> findByEmailId(String emailId);
+  Set<UserMetadata> findByFirstNameContainsIgnoreCase(@NonNull String firstName);
 
-  public Optional<UserMetadata> findByMobile(String mobile);
+  Set<UserMetadata> findByLastNameContainsIgnoreCase(@NonNull String lastName);
 }

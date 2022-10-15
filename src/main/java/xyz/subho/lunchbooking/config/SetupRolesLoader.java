@@ -8,8 +8,8 @@ import java.util.Set;
 import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import xyz.subho.lunchbooking.entities.Permissions;
 import xyz.subho.lunchbooking.entities.Roles;
@@ -19,7 +19,7 @@ import xyz.subho.lunchbooking.repositories.RolesRepository;
 @Slf4j
 @Component
 @Transactional
-public class SetupRolesLoader implements ApplicationListener<ContextRefreshedEvent> {
+public class SetupRolesLoader {
 
   @Autowired private PermissionRepository permissionRepository;
 
@@ -27,13 +27,15 @@ public class SetupRolesLoader implements ApplicationListener<ContextRefreshedEve
 
   boolean alreadySetup = false;
 
-  @Override
-  public void onApplicationEvent(ContextRefreshedEvent event) {
+  @EventListener(ApplicationReadyEvent.class)
+  public void onApplicationEvent() {
 
     if (alreadySetup) return;
 
-    preparePermissions();
-    prepareRoles();
+    while (permissionRepository.count() < Permissions.class.getFields().length)
+      preparePermissions();
+
+    while (rolesRepository.count() < Roles.class.getFields().length) prepareRoles();
 
     alreadySetup = true;
   }

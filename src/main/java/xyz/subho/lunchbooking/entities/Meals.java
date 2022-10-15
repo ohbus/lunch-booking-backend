@@ -48,14 +48,18 @@ public class Meals extends BaseEntity implements Serializable {
   @JsonIgnore
   private Set<MealOptions> mealOptions = new HashSet<>();
 
+  public boolean isActivated() {
+    return Objects.nonNull(activatedAt);
+  }
+
   public boolean activate() {
     activatedAt = System.currentTimeMillis();
-    return Objects.nonNull(activatedAt);
+    return true;
   }
 
   public boolean deactivate() {
     activatedAt = null;
-    return Objects.nonNull(activatedAt);
+    return false;
   }
 
   public int addMealOptions(MealOptions mealOptions) {
