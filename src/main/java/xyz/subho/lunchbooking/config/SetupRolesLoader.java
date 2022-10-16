@@ -25,7 +25,7 @@ public class SetupRolesLoader {
 
   @Autowired private RolesRepository rolesRepository;
 
-  boolean alreadySetup = false;
+  boolean alreadySetup = true;
 
   @EventListener(ApplicationReadyEvent.class)
   public void onApplicationEvent() {

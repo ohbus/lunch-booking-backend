@@ -9,6 +9,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.NaturalIdCache;
 
 @Entity
 @Table(
@@ -24,6 +26,7 @@ import org.hibernate.Hibernate;
 @AllArgsConstructor
 @NoArgsConstructor
 @With
+@NaturalIdCache
 public class UserMetadata extends BaseEntity implements Serializable {
 
   private static final long serialVersionUID = -8209621126460711059L;
@@ -38,6 +41,7 @@ public class UserMetadata extends BaseEntity implements Serializable {
 
   @Column(length = 100, nullable = false, unique = true)
   @NotNull
+  @NaturalId
   private String emailId;
 
   @Column(length = 15, unique = true)

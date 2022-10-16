@@ -1,32 +1,35 @@
 package xyz.subho.lunchbooking.entities;
 
-import lombok.*;
-import org.hibernate.Hibernate;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import javax.persistence.*;
+import lombok.*;
+import org.hibernate.Hibernate;
+import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.NaturalIdCache;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Table(
     name = "users_login",
-    indexes = {@Index(columnList = "username", name = "username")})
+    indexes = {@Index(columnList = "username", name = "username", unique = true)})
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @With
+@NaturalIdCache
 public class UserLogin extends BaseEntity implements UserDetails, Serializable {
 
   private static final long serialVersionUID = -1484069631072335374L;
 
   // User Name is the Email ID
   @Column(name = "username", nullable = false, unique = true, updatable = false, length = 128)
+  @NaturalId
   private String username;
 
   @Column(name = "password", nullable = false)

@@ -1,21 +1,25 @@
 package xyz.subho.lunchbooking.entities;
 
-import lombok.*;
-import org.hibernate.Hibernate;
-
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import javax.persistence.*;
+import lombok.*;
+import org.hibernate.Hibernate;
+import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.NaturalIdCache;
 
 @Entity
-@Table(name = "roles")
+@Table(
+    name = "roles",
+    indexes = {@Index(name = "role", columnList = "role", unique = true)})
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @With
+@NaturalIdCache
 public class Roles extends BaseEntity implements Serializable {
 
   private static final long serialVersionUID = 1466436830227018993L;
@@ -26,6 +30,7 @@ public class Roles extends BaseEntity implements Serializable {
   public static final long CATERER = 4;
 
   @Column(name = "role", nullable = false, length = 32)
+  @NaturalId
   private String role;
 
   public Roles(Long id, String role) {

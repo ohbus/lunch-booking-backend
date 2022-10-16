@@ -6,19 +6,17 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-
 import lombok.*;
 
 @Entity
-@Table(name = "bookings")
+@Table(
+    name = "bookings",
+    indexes = {
+      @Index(name = "date", columnList = "date"),
+      @Index(name = "users_id", columnList = "users_id")
+    })
 @Getter
 @Setter
 @AllArgsConstructor
@@ -63,7 +61,11 @@ public class Bookings extends BaseEntity implements Serializable {
     if (o == null || getClass() != o.getClass()) return false;
     if (!super.equals(o)) return false;
     Bookings bookings = (Bookings) o;
-    return user.equals(bookings.user) && date.equals(bookings.date) && Objects.equals(claimedAt, bookings.claimedAt) && Objects.equals(cancelledAt, bookings.cancelledAt) && bookingsMealOptions.equals(bookings.bookingsMealOptions);
+    return user.equals(bookings.user)
+        && date.equals(bookings.date)
+        && Objects.equals(claimedAt, bookings.claimedAt)
+        && Objects.equals(cancelledAt, bookings.cancelledAt)
+        && bookingsMealOptions.equals(bookings.bookingsMealOptions);
   }
 
   @Override

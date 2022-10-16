@@ -1,5 +1,8 @@
 package xyz.subho.lunchbooking.entities;
 
+import java.io.Serializable;
+import java.util.Objects;
+import javax.persistence.*;
 import lombok.*;
 import org.hibernate.Hibernate;
 import org.springframework.data.annotation.CreatedBy;
@@ -9,10 +12,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-import javax.persistence.*;
-import java.io.Serializable;
-import java.util.Objects;
 
 @Entity(name = "BookingsMealOptions")
 @Table

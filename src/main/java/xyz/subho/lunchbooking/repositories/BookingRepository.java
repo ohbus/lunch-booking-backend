@@ -11,4 +11,7 @@ public interface BookingRepository extends JpaRepository<Bookings, Long> {
   boolean existsByUser_IdAndDate(@NonNull Long id, @NonNull LocalDate date);
 
   Optional<Bookings> findByUser_IdAndDate(@NonNull Long id, @NonNull LocalDate date);
+
+  Optional<Bookings> findByDateAndUser_IdAndCancelledAtNull(
+      @NonNull LocalDate date, @NonNull Long id);
 }

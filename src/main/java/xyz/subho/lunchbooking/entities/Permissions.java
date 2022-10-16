@@ -1,26 +1,28 @@
 package xyz.subho.lunchbooking.entities;
 
-import lombok.*;
-import org.hibernate.Hibernate;
-import org.springframework.security.core.GrantedAuthority;
-
+import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
-import java.util.Objects;
+import lombok.*;
+import org.hibernate.Hibernate;
+import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.NaturalIdCache;
+import org.springframework.security.core.GrantedAuthority;
 
 @Entity
 @Table(
     name = "permissions",
-    indexes = {@Index(columnList = "name", name = "name")})
+    indexes = {@Index(columnList = "name", name = "name", unique = true)})
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @With
+@NaturalIdCache
 public class Permissions extends BaseEntity implements Serializable, GrantedAuthority {
 
   private static final long serialVersionUID = 3053930796866104874L;
@@ -66,8 +68,9 @@ public class Permissions extends BaseEntity implements Serializable, GrantedAuth
     this.name = name;
   }
 
-  @Column(name = "name", nullable = false, length = 64)
+  @Column(name = "name", nullable = false, length = 64, unique = true)
   @NotNull
+  @NaturalId
   private String name;
 
   @Column(name = "enabled", columnDefinition = "boolean default true", nullable = false)

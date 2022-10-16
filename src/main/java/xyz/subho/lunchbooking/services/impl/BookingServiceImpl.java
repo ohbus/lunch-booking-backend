@@ -31,16 +31,16 @@ public class BookingServiceImpl implements BookingService {
     var user = userService.getUserById(userId);
     var mealOption = mealsService.getMealOptionById(mealOptionId);
     var date = mealOption.getMeals().getDate();
-    var bookingOpt = bookingRepository.findByUser_IdAndDate(userId, date);
+    var bookingOpt = bookingRepository.findByDateAndUser_IdAndCancelledAtNull(date, userId);
     if (bookingOpt.isPresent()) {
       log.warn("Booking Already Exists for User ID:{} on Date:{}", userId, date);
       var existingBooking = bookingOpt.get();
       log.debug(
-          "Attempting to Delete Booking with ID:{} for UserID:{} on {}",
+          "Attempting to Cancel Previous Booking with ID:{} for UserID:{} on {}",
           existingBooking.getId(),
           userId,
           date);
-      bookingRepository.deleteById(existingBooking.getId());
+      existingBooking.cancelBooking();
     }
     var booking = new Bookings().withUser(user).withDate(date);
     log.debug("Creating Booking for UserID:{} and Meal Options ID:{}", userId, mealOptionId);
