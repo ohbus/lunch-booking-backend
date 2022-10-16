@@ -25,7 +25,8 @@ public class GlobalExceptionHandlerController {
     UserNotFoundException.class,
     UserIsSecuredException.class,
     PermissionNotFoundException.class,
-    MealNotFoundException.class
+    MealNotFoundException.class,
+    BookingNotFoundException.class
   })
   public ResponseEntity<ErrorDetails> handleAsNotFound(RuntimeException ex) {
 
@@ -55,6 +56,13 @@ public class GlobalExceptionHandlerController {
 
     ErrorDetails errorDetails = new ErrorDetails(ex.getMessage());
     return new ResponseEntity<>(errorDetails, HttpStatus.UNPROCESSABLE_ENTITY);
+  }
+
+  @ExceptionHandler({BookingExistsException.class, InvalidBookingOperation.class})
+  public ResponseEntity<ErrorDetails> handleAsConflict(Exception ex) {
+
+    ErrorDetails errorDetails = new ErrorDetails(ex.getMessage());
+    return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
   }
 
   @ExceptionHandler({Exception.class})

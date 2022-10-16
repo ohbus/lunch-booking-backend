@@ -32,9 +32,11 @@ public class MealDetailsMapper implements Mapper<Meals, MealsModel> {
   public Meals transformBack(MealsModel source) {
     var meal = new Meals();
     BeanUtils.copyProperties(source, meal);
-    source.getMealOptions().forEach(mealOptionsModel ->
-      meal.addMealOptions(mealOptionsMapper.transformBack(mealOptionsModel))
-            );
+    source
+        .getMealOptions()
+        .forEach(
+            mealOptionsModel ->
+                meal.addMealOptions(mealOptionsMapper.transformBack(mealOptionsModel)));
     return meal;
   }
 }

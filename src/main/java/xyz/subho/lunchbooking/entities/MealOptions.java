@@ -9,7 +9,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.persistence.*;
-
 import lombok.*;
 
 @Entity
@@ -57,8 +56,7 @@ public class MealOptions extends BaseEntity implements Serializable {
   }
 
   private void incrementCount() {
-    if (Objects.isNull(count))
-      count = 0;
+    if (Objects.isNull(count)) count = 0;
     count++;
   }
 

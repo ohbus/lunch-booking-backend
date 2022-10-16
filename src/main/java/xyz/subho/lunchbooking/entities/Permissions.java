@@ -1,27 +1,26 @@
 package xyz.subho.lunchbooking.entities;
 
-import java.io.Serializable;
+import lombok.*;
+import org.hibernate.Hibernate;
+import org.springframework.security.core.GrantedAuthority;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.With;
-import org.springframework.security.core.GrantedAuthority;
+import java.io.Serializable;
+import java.util.Objects;
 
 @Entity
 @Table(
     name = "permissions",
     indexes = {@Index(columnList = "name", name = "name")})
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @With
-@EqualsAndHashCode(callSuper = true)
 public class Permissions extends BaseEntity implements Serializable, GrantedAuthority {
 
   private static final long serialVersionUID = 3053930796866104874L;
@@ -81,5 +80,18 @@ public class Permissions extends BaseEntity implements Serializable, GrantedAuth
   @Override
   public String getAuthority() {
     return name;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+    Permissions that = (Permissions) o;
+    return getId() != null && Objects.equals(getId(), that.getId());
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
   }
 }

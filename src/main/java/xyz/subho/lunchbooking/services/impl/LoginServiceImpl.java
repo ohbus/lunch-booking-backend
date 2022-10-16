@@ -199,7 +199,7 @@ public class LoginServiceImpl implements LoginService {
 
     log.debug("Finding role with ID:{}", roleId);
     var roleOpt = rolesRepository.findById(roleId);
-    if (!roleOpt.isPresent()) {
+    if (roleOpt.isEmpty()) {
       log.error("Role is not present for role id:{}", roleId);
       throw new RoleNotFoundException("Role cannot be found");
     }
