@@ -7,6 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import xyz.subho.lunchbooking.entities.Roles;
 import xyz.subho.lunchbooking.entities.UserLogin;
@@ -30,7 +33,7 @@ import xyz.subho.lunchbooking.services.LoginService;
 
 @Service
 @Slf4j
-public class LoginServiceImpl implements LoginService {
+public class LoginServiceImpl implements LoginService, UserDetailsService {
 
   @Autowired private UserLoginRepository loginRepository;
 
@@ -249,5 +252,10 @@ public class LoginServiceImpl implements LoginService {
   public void UserChangePassword(UserChangePasswordRequestModel changePasswordRequest) {
     // TODO Auto-generated method stub
 
+  }
+
+  @Override
+  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    return getUserByUsername(username);
   }
 }
