@@ -4,10 +4,10 @@ import java.security.Principal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.bind.annotation.*;
+import xyz.subho.lunchbooking.entities.Roles;
+import xyz.subho.lunchbooking.models.AvailBookingResponseModel;
 import xyz.subho.lunchbooking.models.CreateBookingResponseModel;
 import xyz.subho.lunchbooking.services.BookingService;
 
@@ -23,5 +23,23 @@ public class BookingController {
       @PathVariable long mealOptionId, Principal principal) {
     return new CreateBookingResponseModel(
         bookingService.createBooking(mealOptionId, Long.parseLong(principal.getName())));
+  }
+
+  @PutMapping(EndpointPropertyKey.BOOKING_AVAIL)
+  public AvailBookingResponseModel availBooking(
+          @PathVariable long bookingId, Principal principal) {
+    return new AvailBookingResponseModel(
+            bookingService.availBooking(bookingId, Long.parseLong(principal.getName())));
+  }
+
+  @Secured({
+          Roles.ROLE_CATERER,
+          Roles.ROLE_MANAGER,
+          Roles.ROLE_ADMINISTRATOR
+  })
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @DeleteMapping(EndpointPropertyKey.BOOKING_DELETE)
+  public void cancelBooking(@PathVariable long bookingId, Principal principal) {
+    bookingService.cancelBookingById(bookingId, Long.parseLong(principal.getName()));
   }
 }

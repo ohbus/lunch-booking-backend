@@ -12,4 +12,6 @@ public final class EndpointPropertyKey {
   public static final String MEAL_CREATE = "/meal/create";
 
   public static final String BOOKING_CREATE = "/booking/create/{mealOptionId}";
+  public static final String BOOKING_AVAIL = "/booking/avail/{bookingId}";
+  public static final String BOOKING_DELETE = "/booking/{bookingId}";
 }

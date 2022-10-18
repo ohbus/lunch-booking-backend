@@ -1,12 +1,16 @@
 package xyz.subho.lunchbooking.services.impl;
 
+import java.util.List;
 import java.util.Objects;
 import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 import xyz.subho.lunchbooking.entities.Bookings;
+import xyz.subho.lunchbooking.entities.Roles;
+import xyz.subho.lunchbooking.entities.UserMetadata;
 import xyz.subho.lunchbooking.exceptions.BookingNotFoundException;
 import xyz.subho.lunchbooking.exceptions.InvalidBookingOperation;
 import xyz.subho.lunchbooking.repositories.BookingRepository;
@@ -26,6 +30,9 @@ public class BookingServiceImpl implements BookingService {
 
   @Override
   @Transactional
+  @Secured({
+
+  })
   public long createBooking(long mealOptionId, long userId) {
 
     var user = userService.getUserById(userId);
@@ -51,27 +58,30 @@ public class BookingServiceImpl implements BookingService {
 
   @Override
   @Transactional
-  public long cancelBookingById(long id) {
+  public long cancelBookingById(long id, long userId) {
     var booking = getBookingById(id);
+    var user = userService.getUserById(userId);
     if (Objects.nonNull(booking.getCancelledAt())) {
       log.error("Booking ID:{} is already cancelled", id);
       throw new InvalidBookingOperation(String.format("Booking ID:%s is already cancelled!", id));
     }
+    checkIfBookingOwnedByUser(booking, user);
     return booking.cancelBooking();
   }
 
   @Override
   @Transactional
-  public long cancelBooking(@NonNull Bookings booking) {
+  public long cancelBooking(@NonNull Bookings booking, long userId) {
     if (Objects.isNull(booking.getId())) {
       log.error("Booking ID cannot be null");
       throw new BookingNotFoundException("Booking ID is null");
     }
-    return cancelBookingById(booking.getId());
+    return cancelBookingById(booking.getId(), userId);
   }
 
   @Override
   @Transactional
+  @Secured({Roles.ROLE_ADMINISTRATOR})
   public void deleteBookingById(long id) {
     log.debug("Booking ID:{} is being deleted", id);
     var bookingToBeDeleted = getBookingById(id);
@@ -102,12 +112,41 @@ public class BookingServiceImpl implements BookingService {
 
   @Override
   @Transactional
-  public long availBooking(long id) {
+  @Secured({
+          Roles.ROLE_CATERER,
+          Roles.ROLE_MANAGER,
+          Roles.ROLE_ADMINISTRATOR
+  })
+  public long availBooking(long id, long userId) {
     var booking = getBookingById(id);
+    var user = userService.getUserById(userId);
     if (Objects.nonNull(booking.getClaimedAt())) {
       log.error("Booking ID:{} is already claimed!", id);
       throw new InvalidBookingOperation(String.format("Booking ID:%s is already claimed!", id));
     }
+    checkIfBookingOwnedByUser(booking, user);
     return booking.availBooking();
+  }
+
+  @Override
+  public List<Bookings> getAllBookingForToday() {
+    return null;
+  }
+
+  @Override
+  public Bookings getBookingForTodayByUser(long userId) {
+    return null;
+  }
+
+  @Override
+  public List<Bookings> getBookingsInRange() {
+    return null;
+  }
+
+  private void checkIfBookingOwnedByUser(Bookings booking, UserMetadata user) {
+    if (booking.getUser().equals(user)) {
+      log.error("Booking ID:{} does not belong to User ID:{}", booking.getId(), user.getId());
+      throw new InvalidBookingOperation(String.format("Booking ID:%s does not belong to User ID:%s", booking.getId(), user.getId()));
+    }
   }
 }

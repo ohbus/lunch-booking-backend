@@ -2,9 +2,14 @@ package xyz.subho.lunchbooking.entities;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.Set;
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.*;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.NaturalId;
@@ -28,6 +33,11 @@ public class Roles extends BaseEntity implements Serializable {
   public static final long MANAGER = 2;
   public static final long EMPLOYEE = 3;
   public static final long CATERER = 4;
+
+  public static final String ROLE_ADMINISTRATOR = "ADMINISTRATOR";
+  public static final String ROLE_MANAGER = "MANAGER";
+  public static final String ROLE_EMPLOYEE = "EMPLOYEE";
+  public static final String ROLE_CATERER = "CATERER";
 
   @Column(name = "role", nullable = false, length = 32)
   @NaturalId
@@ -57,5 +67,46 @@ public class Roles extends BaseEntity implements Serializable {
   @Override
   public int hashCode() {
     return getClass().hashCode();
+  }
+
+  public enum Role {
+
+    ADMINISTRATOR("ADMINISTRATOR"),
+    MANAGER("MANAGER"),
+    EMPLOYEE("EMPLOYEE"),
+    CATERER("CATERER");
+    private final String value;
+    private static final Map<String, Role> CONSTANTS = new HashMap<>();
+
+    static {
+      for (Roles.Role c: values()) {
+        CONSTANTS.put(c.value, c);
+      }
+    }
+
+    private Role(String value) {
+      this.value = value;
+    }
+
+    @Override
+    public String toString() {
+      return this.value;
+    }
+
+    @JsonValue
+    public String value() {
+      return this.value;
+    }
+
+    @JsonCreator
+    public static Roles.Role fromValue(String value) {
+      Roles.Role constant = CONSTANTS.get(value);
+      if (constant == null) {
+        throw new IllegalArgumentException(value);
+      } else {
+        return constant;
+      }
+    }
+
   }
 }

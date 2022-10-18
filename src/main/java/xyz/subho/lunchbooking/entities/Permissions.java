@@ -1,12 +1,17 @@
 package xyz.subho.lunchbooking.entities;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.*;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.NaturalId;
@@ -96,5 +101,72 @@ public class Permissions extends BaseEntity implements Serializable, GrantedAuth
   @Override
   public int hashCode() {
     return getClass().hashCode();
+  }
+
+  public enum Permission {
+
+    CREATE_USER("CREATE_USER"),
+    READ_USER("READ_USER"),
+    UPDATE_USER("UPDATE_USER"),
+    DELETE_USER("DELETE_USER"),
+
+    CREATE_ROLE("CREATE_ROLE"),
+    READ_ROLE("READ_ROLE"),
+    UPDATE_ROLE("UPDATE_ROLE"),
+    DELETE_ROLE("DELETE_ROLE"),
+
+    CREATE_PERMISSION("CREATE_PERMISSION"),
+    READ_PERMISSION("READ_PERMISSION"),
+    UPDATE_PERMISSION("UPDATE_PERMISSION"),
+    DELETE_PERMISSION("DELETE_PERMISSION"),
+
+    CREATE_BOOKING("CREATE_BOOKING"),
+    READ_BOOKING("READ_BOOKING"),
+    UPDATE_BOOKING("UPDATE_BOOKING"),
+    DELETE_BOOKING("DELETE_BOOKING"),
+
+    CREATE_MEAL("CREATE_MEAL"),
+    READ_MEAL("READ_MEAL"),
+    UPDATE_MEAL("UPDATE_MEAL"),
+    DELETE_MEAL("DELETE_MEAL"),
+
+    CREATE_MEAL_OPTIONS("CREATE_MEAL_OPTIONS"),
+    READ_MEAL_OPTIONS("READ_MEAL_OPTIONS"),
+    UPDATE_MEAL_OPTIONS("UPDATE_MEAL_OPTIONS"),
+    DELETE_MEAL_OPTIONS("DELETE_MEAL_OPTIONS");
+
+    private final String value;
+    private static final Map<String, Permissions.Permission> CONSTANTS = new HashMap<>();
+
+    static {
+      for (Permissions.Permission c: values()) {
+        CONSTANTS.put(c.value, c);
+      }
+    }
+
+    private Permission(String value) {
+      this.value = value;
+    }
+
+    @Override
+    public String toString() {
+      return this.value;
+    }
+
+    @JsonValue
+    public String value() {
+      return this.value;
+    }
+
+    @JsonCreator
+    public static Permissions.Permission fromValue(String value) {
+      Permissions.Permission constant = CONSTANTS.get(value);
+      if (constant == null) {
+        throw new IllegalArgumentException(value);
+      } else {
+        return constant;
+      }
+    }
+
   }
 }
