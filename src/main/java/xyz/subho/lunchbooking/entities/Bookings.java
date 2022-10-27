@@ -37,11 +37,7 @@ public class Bookings extends BaseEntity implements Serializable {
 
   private Long cancelledAt;
 
-  @OneToMany(
-      mappedBy = "bookings",
-      cascade = CascadeType.ALL,
-      fetch = FetchType.LAZY,
-      orphanRemoval = true)
+  @OneToMany(mappedBy = "bookings", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JsonIgnore
   private Set<BookingsMealOptions> bookingsMealOptions = new HashSet<>();
 

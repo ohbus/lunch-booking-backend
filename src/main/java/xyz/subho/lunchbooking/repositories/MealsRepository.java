@@ -13,4 +13,6 @@ public interface MealsRepository extends JpaRepository<Meals, Long> {
   Set<Meals> findByDateGreaterThanEqualOrderByDateDesc(@NonNull LocalDate date);
 
   Set<Meals> findByDateLessThanOrderByDateDesc(@NonNull LocalDate date);
+
+  boolean existsByDate(@NonNull LocalDate date);
 }

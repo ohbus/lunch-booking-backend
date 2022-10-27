@@ -10,6 +10,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.NaturalIdCache;
 
 @Entity
 @Table(
@@ -23,6 +25,7 @@ import org.hibernate.Hibernate;
 @AllArgsConstructor
 @NoArgsConstructor
 @With
+@NaturalIdCache
 public class Meals extends BaseEntity implements Serializable {
 
   private static final long serialVersionUID = -657646258883261176L;
@@ -31,31 +34,43 @@ public class Meals extends BaseEntity implements Serializable {
   @NotNull
   private String name;
 
+  @NaturalId
+  @Column(unique = true, nullable = false)
   private LocalDate date;
 
   private Long activatedAt;
 
-  @OneToMany(
-      mappedBy = "meals",
-      cascade = CascadeType.ALL,
-      fetch = FetchType.LAZY,
-      orphanRemoval = true)
+  private Long lockedAt;
+
+  @OneToMany(mappedBy = "meals", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JsonIgnore
   @ToString.Exclude
   private Set<MealOptions> mealOptions = new HashSet<>();
 
+  public long lock() {
+    lockedAt = System.currentTimeMillis();
+    return lockedAt;
+  }
+
+  public void unlock() {
+    lockedAt = null;
+  }
+
+  public boolean isLocked() {
+    return Objects.nonNull(lockedAt);
+  }
+
+  public long activate() {
+    activatedAt = System.currentTimeMillis();
+    return activatedAt;
+  }
+
+  public void deactivate() {
+    activatedAt = null;
+  }
+
   public boolean isActivated() {
     return Objects.nonNull(activatedAt);
-  }
-
-  public boolean activate() {
-    activatedAt = System.currentTimeMillis();
-    return true;
-  }
-
-  public boolean deactivate() {
-    activatedAt = null;
-    return false;
   }
 
   public int addMealOptions(MealOptions mealOptions) {

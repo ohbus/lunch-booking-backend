@@ -1,5 +1,7 @@
 package xyz.subho.lunchbooking.entities;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,9 +11,6 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.*;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.NaturalId;
@@ -104,7 +103,6 @@ public class Permissions extends BaseEntity implements Serializable, GrantedAuth
   }
 
   public enum Permission {
-
     CREATE_USER("CREATE_USER"),
     READ_USER("READ_USER"),
     UPDATE_USER("UPDATE_USER"),
@@ -139,7 +137,7 @@ public class Permissions extends BaseEntity implements Serializable, GrantedAuth
     private static final Map<String, Permissions.Permission> CONSTANTS = new HashMap<>();
 
     static {
-      for (Permissions.Permission c: values()) {
+      for (Permissions.Permission c : values()) {
         CONSTANTS.put(c.value, c);
       }
     }
@@ -167,6 +165,5 @@ public class Permissions extends BaseEntity implements Serializable, GrantedAuth
         return constant;
       }
     }
-
   }
 }

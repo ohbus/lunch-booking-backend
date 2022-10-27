@@ -58,7 +58,13 @@ public class GlobalExceptionHandlerController {
     return new ResponseEntity<>(errorDetails, HttpStatus.UNPROCESSABLE_ENTITY);
   }
 
-  @ExceptionHandler({BookingExistsException.class, InvalidBookingOperation.class})
+  @ExceptionHandler({
+    BookingExistsException.class,
+    InvalidBookingOperation.class,
+    SelectionLockedException.class,
+    SelectionNotAvailableException.class,
+    InvalidMealOperation.class
+  })
   public ResponseEntity<ErrorDetails> handleAsConflict(Exception ex) {
 
     ErrorDetails errorDetails = new ErrorDetails(ex.getMessage());

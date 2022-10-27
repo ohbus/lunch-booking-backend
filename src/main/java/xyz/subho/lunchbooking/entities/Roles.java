@@ -1,15 +1,14 @@
 package xyz.subho.lunchbooking.entities;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Objects;
 import java.util.Set;
 import javax.persistence.*;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.*;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.NaturalId;
@@ -70,7 +69,6 @@ public class Roles extends BaseEntity implements Serializable {
   }
 
   public enum Role {
-
     ADMINISTRATOR("ADMINISTRATOR"),
     MANAGER("MANAGER"),
     EMPLOYEE("EMPLOYEE"),
@@ -79,7 +77,7 @@ public class Roles extends BaseEntity implements Serializable {
     private static final Map<String, Role> CONSTANTS = new HashMap<>();
 
     static {
-      for (Roles.Role c: values()) {
+      for (Roles.Role c : values()) {
         CONSTANTS.put(c.value, c);
       }
     }
@@ -107,6 +105,5 @@ public class Roles extends BaseEntity implements Serializable {
         return constant;
       }
     }
-
   }
 }

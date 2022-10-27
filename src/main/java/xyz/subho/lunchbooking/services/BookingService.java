@@ -1,9 +1,9 @@
 package xyz.subho.lunchbooking.services;
 
-import xyz.subho.lunchbooking.entities.Bookings;
-
-import java.awt.print.Book;
+import java.time.LocalDate;
 import java.util.List;
+import xyz.subho.lunchbooking.entities.Bookings;
+import xyz.subho.lunchbooking.models.BookingResponseModel;
 
 public interface BookingService {
 
@@ -19,11 +19,13 @@ public interface BookingService {
 
   public Bookings getBookingById(long id);
 
-  public long availBooking(long id, long userId);
+  public BookingResponseModel availBooking(long id, long userId);
 
-  public List<Bookings> getAllBookingForToday();
+  public BookingResponseModel getCurrentBooking(long userId);
 
-  public Bookings getBookingForTodayByUser(long userId);
+  public List<BookingResponseModel> getUpcomingBookings(long userId);
 
-  public List<Bookings> getBookingsInRange();
+  public List<BookingResponseModel> getPreviousBookings(long userId);
+
+  public List<BookingResponseModel> getBookingsByDate(LocalDate date);
 }
