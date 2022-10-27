@@ -22,7 +22,7 @@
 		<spotless.plugin.version>2.23.0</spotless.plugin.version>
 		<google-java-format.version>1.15.0</google-java-format.version>
 		<license-maven-plugin.version>4.1</license-maven-plugin.version>
-		<auth0-jwt.version>4.0.0</auth0-jwt.version>
+		<auth0-jwt.version>4.2.1</auth0-jwt.version>
 		<jacoco.version>0.8.8</jacoco.version>
 		<sonar.projectKey>ohbus_lunch-booking-backend</sonar.projectKey>
 		<sonar.organization>ohbus</sonar.organization>
