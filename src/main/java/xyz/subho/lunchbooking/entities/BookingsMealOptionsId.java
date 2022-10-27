@@ -2,13 +2,13 @@ package xyz.subho.lunchbooking.entities;
 
 import java.io.Serializable;
 import javax.persistence.Embeddable;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.With;
+import lombok.*;
 
 @Embeddable
-@Data
+@Setter
+@Getter
 @AllArgsConstructor
+@NoArgsConstructor
 @With
 public class BookingsMealOptionsId implements Serializable {
 

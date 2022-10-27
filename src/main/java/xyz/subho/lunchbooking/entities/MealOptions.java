@@ -8,53 +8,38 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.With;
+import javax.persistence.*;
+import lombok.*;
 
 @Entity
 @Table(
     name = "meal_options",
-    indexes = {@Index(columnList = "name")})
-@Data
+    indexes = {@Index(columnList = "name", name = "name")})
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @With
-@EqualsAndHashCode(callSuper = true)
 public class MealOptions extends BaseEntity implements Serializable {
 
   private static final long serialVersionUID = -6473537837965565355L;
 
   @Column(length = 30, nullable = false)
-  @NotNull
   private String name;
 
-  @ManyToOne
-  @JoinColumn(name = "meals_id", nullable = false)
-  @NotNull
+  @ManyToOne(targetEntity = Meals.class)
   private Meals meals;
 
   private Integer count = 0;
 
-  @OneToMany(
-      mappedBy = "mealOptions",
-      cascade = CascadeType.ALL,
-      fetch = FetchType.LAZY,
-      orphanRemoval = true)
+  @OneToMany(mappedBy = "mealOptions", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JsonIgnore
   private Set<BookingsMealOptions> bookingsMealOptions = new HashSet<>();
+
+  public MealOptions(String name) {
+    this.name = name;
+    count = 0;
+  }
 
   public void addBookings(List<Bookings> bookings) {
     if (Objects.nonNull(bookings))
@@ -62,8 +47,13 @@ public class MealOptions extends BaseEntity implements Serializable {
           booking -> {
             var mapping = new BookingsMealOptions(booking, this);
             this.bookingsMealOptions.add(mapping);
-            this.count++;
+            incrementCount();
           });
+  }
+
+  private void incrementCount() {
+    if (Objects.isNull(count)) count = 0;
+    count++;
   }
 
   public void addBooking(Bookings booking) {
@@ -82,5 +72,17 @@ public class MealOptions extends BaseEntity implements Serializable {
             .collect(Collectors.toSet());
     bookingsMealOptions.removeAll(toBeDeleted);
     count -= toBeDeleted.size();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof MealOptions)) return false;
+    return this.getId() != null && this.getId().equals(((MealOptions) o).getId());
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
   }
 }

@@ -3,20 +3,14 @@ package xyz.subho.lunchbooking.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Index;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.With;
+import lombok.*;
+import org.hibernate.Hibernate;
+import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.NaturalIdCache;
 
 @Entity
 @Table(
@@ -27,11 +21,12 @@ import lombok.With;
       @Index(columnList = "emailId", name = "emailId"),
       @Index(columnList = "mobile", name = "mobile")
     })
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @With
-@EqualsAndHashCode(callSuper = true)
+@NaturalIdCache
 public class UserMetadata extends BaseEntity implements Serializable {
 
   private static final long serialVersionUID = -8209621126460711059L;
@@ -46,6 +41,7 @@ public class UserMetadata extends BaseEntity implements Serializable {
 
   @Column(length = 100, nullable = false, unique = true)
   @NotNull
+  @NaturalId
   private String emailId;
 
   @Column(length = 15, unique = true)
@@ -53,5 +49,19 @@ public class UserMetadata extends BaseEntity implements Serializable {
 
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JsonIgnore
+  @ToString.Exclude
   private Set<Bookings> bookings = new HashSet<>();
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+    UserMetadata that = (UserMetadata) o;
+    return getId() != null && Objects.equals(getId(), that.getId());
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
+  }
 }

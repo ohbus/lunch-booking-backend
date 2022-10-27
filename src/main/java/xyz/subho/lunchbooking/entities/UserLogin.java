@@ -5,38 +5,31 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.With;
+import javax.persistence.*;
+import lombok.*;
+import org.hibernate.Hibernate;
+import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.NaturalIdCache;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Table(
     name = "users_login",
-    indexes = {@Index(columnList = "username")})
-@Data
+    indexes = {@Index(columnList = "username", name = "username", unique = true)})
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @With
-@EqualsAndHashCode(callSuper = true)
+@NaturalIdCache
 public class UserLogin extends BaseEntity implements UserDetails, Serializable {
 
   private static final long serialVersionUID = -1484069631072335374L;
 
   // User Name is the Email ID
   @Column(name = "username", nullable = false, unique = true, updatable = false, length = 128)
+  @NaturalId
   private String username;
 
   @Column(name = "password", nullable = false)
@@ -64,7 +57,7 @@ public class UserLogin extends BaseEntity implements UserDetails, Serializable {
 
   @Basic private Long lastLogin;
 
-  @ManyToMany(fetch = FetchType.LAZY)
+  @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
       name = "users_roles",
       joinColumns = @JoinColumn(name = "user_id"),
@@ -85,7 +78,7 @@ public class UserLogin extends BaseEntity implements UserDetails, Serializable {
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     Set<Permissions> permission = new HashSet<>();
-    this.roles.forEach(role -> permission.addAll(role.getPermissions()));
+    roles.forEach(role -> permission.addAll(role.getPermissions()));
     return permission;
   }
 
@@ -107,5 +100,18 @@ public class UserLogin extends BaseEntity implements UserDetails, Serializable {
   @Override
   public boolean isEnabled() {
     return enabled;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+    UserLogin userLogin = (UserLogin) o;
+    return getId() != null && Objects.equals(getId(), userLogin.getId());
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
   }
 }

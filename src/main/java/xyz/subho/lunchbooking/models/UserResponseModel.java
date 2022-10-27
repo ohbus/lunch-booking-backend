@@ -6,7 +6,6 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.With;
 
@@ -14,10 +13,11 @@ import lombok.With;
 @NoArgsConstructor
 @AllArgsConstructor
 @With
-@EqualsAndHashCode(callSuper = true)
-public class UserResponseModel extends BaseModel implements Serializable {
+public class UserResponseModel implements Serializable {
 
   private static final long serialVersionUID = -4738759449624774954L;
+
+  private Long id;
 
   @NotBlank(message = "First Name cannot be blank")
   private String firstName;

@@ -6,29 +6,26 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Index;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.With;
+import lombok.*;
+import org.hibernate.Hibernate;
+import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.NaturalIdCache;
 
 @Entity
 @Table(
     name = "meals",
-    indexes = {@Index(columnList = "name"), @Index(columnList = "date")})
-@Data
+    indexes = {
+      @Index(columnList = "name", name = "name"),
+      @Index(columnList = "date", name = "date")
+    })
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @With
-@EqualsAndHashCode(callSuper = true)
+@NaturalIdCache
 public class Meals extends BaseEntity implements Serializable {
 
   private static final long serialVersionUID = -657646258883261176L;
@@ -37,21 +34,42 @@ public class Meals extends BaseEntity implements Serializable {
   @NotNull
   private String name;
 
+  @NaturalId
+  @Column(unique = true, nullable = false)
   private LocalDate date;
 
   private Long activatedAt;
 
+  private Long lockedAt;
+
   @OneToMany(mappedBy = "meals", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JsonIgnore
+  @ToString.Exclude
   private Set<MealOptions> mealOptions = new HashSet<>();
 
-  public boolean activate() {
-    activatedAt = System.currentTimeMillis();
-    return Objects.nonNull(activatedAt);
+  public long lock() {
+    lockedAt = System.currentTimeMillis();
+    return lockedAt;
   }
 
-  public boolean deactivate() {
+  public void unlock() {
+    lockedAt = null;
+  }
+
+  public boolean isLocked() {
+    return Objects.nonNull(lockedAt);
+  }
+
+  public long activate() {
+    activatedAt = System.currentTimeMillis();
+    return activatedAt;
+  }
+
+  public void deactivate() {
     activatedAt = null;
+  }
+
+  public boolean isActivated() {
     return Objects.nonNull(activatedAt);
   }
 
@@ -63,5 +81,18 @@ public class Meals extends BaseEntity implements Serializable {
   public int removeMealOptions(MealOptions mealOptions) {
     this.mealOptions.removeIf(option -> option.getId().equals(mealOptions.getId()));
     return this.mealOptions.size();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+    Meals meals = (Meals) o;
+    return getId() != null && Objects.equals(getId(), meals.getId());
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
   }
 }

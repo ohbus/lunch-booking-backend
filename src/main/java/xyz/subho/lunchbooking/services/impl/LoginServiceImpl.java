@@ -7,6 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import xyz.subho.lunchbooking.entities.Roles;
 import xyz.subho.lunchbooking.entities.UserLogin;
@@ -30,7 +33,7 @@ import xyz.subho.lunchbooking.services.LoginService;
 
 @Service
 @Slf4j
-public class LoginServiceImpl implements LoginService {
+public class LoginServiceImpl implements LoginService, UserDetailsService {
 
   @Autowired private UserLoginRepository loginRepository;
 
@@ -86,7 +89,7 @@ public class LoginServiceImpl implements LoginService {
   }
 
   private boolean checkIfUserExists(String username) {
-    return loginRepository.existsUserLoginByUsername(username);
+    return loginRepository.existsByUsername(username);
   }
 
   @Transactional
@@ -187,11 +190,11 @@ public class LoginServiceImpl implements LoginService {
 
     log.debug("Finding user with ID:{}", userId);
     var userLoginOpt = loginRepository.findById(userId);
-    if (!userLoginOpt.isPresent()) {
+    if (userLoginOpt.isEmpty()) {
       log.error("Cannot Find User with ID:{}", userId);
-      throw new UserNotFoundException(String.format("Invlaid User ID:%s", userId));
+      throw new UserNotFoundException(String.format("Invalid User ID:%s", userId));
     }
-    log.debug("Found user with ID:%s", userId);
+    log.debug("Found user with ID:{}", userId);
     return userLoginOpt.get();
   }
 
@@ -199,7 +202,7 @@ public class LoginServiceImpl implements LoginService {
 
     log.debug("Finding role with ID:{}", roleId);
     var roleOpt = rolesRepository.findById(roleId);
-    if (!roleOpt.isPresent()) {
+    if (roleOpt.isEmpty()) {
       log.error("Role is not present for role id:{}", roleId);
       throw new RoleNotFoundException("Role cannot be found");
     }
@@ -249,5 +252,10 @@ public class LoginServiceImpl implements LoginService {
   public void UserChangePassword(UserChangePasswordRequestModel changePasswordRequest) {
     // TODO Auto-generated method stub
 
+  }
+
+  @Override
+  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    return getUserByUsername(username);
   }
 }
