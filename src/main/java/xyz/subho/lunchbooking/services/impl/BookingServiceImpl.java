@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,12 +99,13 @@ public class BookingServiceImpl implements BookingService {
     var mealOption = mealsService.getMealOptionsByBookingId(id);
     mealOption.removeBookingById(id);
 
+    Optional<Long> lockedAt = Optional.ofNullable(mealOption.getMeals().getLockedAt());
     // If the Booking is Cancelled after Locking the Meal
-    if (LocalDateTime.now()
-        .isAfter(
-            LocalDateTime.ofInstant(
-                Instant.ofEpochMilli(mealOption.getMeals().getLockedAt()),
-                ZoneId.systemDefault()))) {
+    if (lockedAt.isPresent()
+        && LocalDateTime.now()
+            .isAfter(
+                LocalDateTime.ofInstant(
+                    Instant.ofEpochMilli(lockedAt.get()), ZoneId.systemDefault()))) {
       // Available Meal Bookings for a particular day is created for broadcast
       createAvailableMealForToday(mealOption);
     }
@@ -159,6 +161,7 @@ public class BookingServiceImpl implements BookingService {
             userId,
             mealOptionId);
         availableBooking.claim();
+        mealOption.addBooking(booking);
         return booking.getId();
       } else {
         log.error(
@@ -278,7 +281,7 @@ public class BookingServiceImpl implements BookingService {
   }
 
   private void checkIfBookingOwnedByUser(Bookings booking, UserMetadata user) {
-    if (booking.getUser().equals(user)) {
+    if (!booking.getUser().equals(user)) {
       log.error("Booking ID:{} does not belong to User ID:{}", booking.getId(), user.getId());
       throw new InvalidBookingOperation(
           String.format(

@@ -56,7 +56,6 @@ public class MealOptions extends BaseEntity implements Serializable {
   }
 
   private void incrementCount() {
-    if (Objects.isNull(count)) count = 0;
     count++;
   }
 
