@@ -29,8 +29,9 @@ public class BookingController {
   }
 
   @PutMapping(EndpointPropertyKey.BOOKING_AVAIL)
-  public BookingResponseModel availBooking(@PathVariable long bookingId, Principal principal) {
-    return bookingService.availBooking(bookingId, Long.parseLong(principal.getName()));
+  @Secured({Roles.ROLE_CATERER, Roles.ROLE_MANAGER, Roles.ROLE_ADMINISTRATOR})
+  public BookingResponseModel availBooking(@PathVariable long bookingId) {
+    return bookingService.availBooking(bookingId);
   }
 
   @Secured({Roles.ROLE_CATERER, Roles.ROLE_MANAGER, Roles.ROLE_ADMINISTRATOR})
@@ -40,17 +41,21 @@ public class BookingController {
     bookingService.cancelBookingById(bookingId, Long.parseLong(principal.getName()));
   }
 
+  @GetMapping(EndpointPropertyKey.BOOKING_FOR_TODAY)
+  public BookingResponseModel getTodayBookingForUser(Principal principal) {
+    return bookingService.getCurrentBooking(Long.parseLong(principal.getName()));
+  }
+
   @GetMapping(EndpointPropertyKey.BOOKING_FETCH_FOR_USER)
   public List<BookingResponseModel> getUserBookings(
-      @RequestParam("prev") String prev, Principal principal) {
+      @RequestParam(value = "prev", required = false) String prev, Principal principal) {
     long userId = Long.parseLong(principal.getName());
     if (StringUtils.isNotBlank(prev)) return bookingService.getPreviousBookings(userId);
     return bookingService.getUpcomingBookings(userId);
   }
 
   @GetMapping(EndpointPropertyKey.BOOKINGS_BY_DATE)
-  public List<BookingResponseModel> getAllBookingsForDate(
-      @PathVariable("date") LocalDate date, Principal principal) {
+  public List<BookingResponseModel> getAllBookingsForDate(@PathVariable("date") LocalDate date) {
     return bookingService.getBookingsByDate(date);
   }
 }

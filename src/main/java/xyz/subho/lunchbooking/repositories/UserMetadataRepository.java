@@ -12,6 +12,8 @@ public interface UserMetadataRepository extends JpaRepository<UserMetadata, Long
 
   Optional<UserMetadata> findByMobile(@NonNull String mobile);
 
+  boolean existsByMobileIgnoreCase(@NonNull String mobile);
+
   Set<UserMetadata> findByFirstNameContainsIgnoreCase(@NonNull String firstName);
 
   Set<UserMetadata> findByLastNameContainsIgnoreCase(@NonNull String lastName);

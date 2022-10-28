@@ -137,15 +137,12 @@ public class BookingServiceImpl implements BookingService {
 
   @Override
   @Transactional
-  @Secured({Roles.ROLE_CATERER, Roles.ROLE_MANAGER, Roles.ROLE_ADMINISTRATOR})
-  public BookingResponseModel availBooking(long id, long userId) {
+  public BookingResponseModel availBooking(long id) {
     var booking = getBookingById(id);
-    var user = userService.getUserById(userId);
     if (Objects.nonNull(booking.getClaimedAt())) {
       log.error("Booking ID:{} is already claimed!", id);
       throw new InvalidBookingOperation(String.format("Booking ID:%s is already claimed!", id));
     }
-    checkIfBookingOwnedByUser(booking, user);
     booking.availBooking();
     return bookingResponseModelMapper.transform(booking);
   }
@@ -154,7 +151,7 @@ public class BookingServiceImpl implements BookingService {
   public BookingResponseModel getCurrentBooking(long userId) {
     var today = LocalDate.now();
     log.debug("Finding Booking for User ID:{} for Today:{}", userId, today);
-    var bookingOpt = bookingRepository.findByUser_IdAndDate(userId, today);
+    var bookingOpt = bookingRepository.findByDateAndUser_IdAndCancelledAtNull(today, userId);
     if (bookingOpt.isEmpty()) {
       log.error("User ID:{} does not have booking for today:{}", userId, today);
       throw new BookingNotFoundException("Booking Not Found for today.");

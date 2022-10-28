@@ -19,7 +19,7 @@ public interface BookingService {
 
   public Bookings getBookingById(long id);
 
-  public BookingResponseModel availBooking(long id, long userId);
+  public BookingResponseModel availBooking(long id);
 
   public BookingResponseModel getCurrentBooking(long userId);
 

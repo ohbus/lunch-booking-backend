@@ -18,6 +18,8 @@ public class MealOptionsModel implements Serializable {
   @NotBlank(message = "Name cannot be blank")
   private String name;
 
+  private Boolean selected;
+
   private Integer count;
 
   MealOptionsModel(String name) {
