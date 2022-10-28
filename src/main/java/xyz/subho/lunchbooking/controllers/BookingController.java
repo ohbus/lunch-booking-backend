@@ -36,7 +36,7 @@ public class BookingController {
 
   @Secured({Roles.ROLE_CATERER, Roles.ROLE_MANAGER, Roles.ROLE_ADMINISTRATOR})
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  @DeleteMapping(EndpointPropertyKey.BOOKING_DELETE)
+  @DeleteMapping(EndpointPropertyKey.BOOKING_ID)
   public void cancelBooking(@PathVariable long bookingId, Principal principal) {
     bookingService.cancelBookingById(bookingId, Long.parseLong(principal.getName()));
   }
@@ -57,5 +57,12 @@ public class BookingController {
   @GetMapping(EndpointPropertyKey.BOOKINGS_BY_DATE)
   public List<BookingResponseModel> getAllBookingsForDate(@PathVariable("date") LocalDate date) {
     return bookingService.getBookingsByDate(date);
+  }
+
+  @PutMapping(EndpointPropertyKey.BOOKING_PICK_UP)
+  public CreateBookingResponseModel createBookingFromAvailableOptions(
+      @PathVariable long mealOptionId, Principal principal) {
+    return new CreateBookingResponseModel(
+        bookingService.claimAvailableMeal(mealOptionId, Long.parseLong(principal.getName())));
   }
 }

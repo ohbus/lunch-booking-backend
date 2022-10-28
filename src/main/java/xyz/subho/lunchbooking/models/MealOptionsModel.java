@@ -20,7 +20,7 @@ public class MealOptionsModel implements Serializable {
 
   private Boolean selected;
 
-  private Integer count;
+  private int count;
 
   MealOptionsModel(String name) {
     this.name = name;

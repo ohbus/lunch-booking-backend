@@ -13,6 +13,8 @@ public interface BookingService {
 
   public long cancelBooking(Bookings booking, long userId);
 
+  public long claimAvailableMeal(long mealOptionId, long userId);
+
   public void deleteBookingById(long id);
 
   public void deleteBooking(Bookings booking);

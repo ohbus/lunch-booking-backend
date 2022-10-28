@@ -30,11 +30,15 @@ public class MealOptions extends BaseEntity implements Serializable {
   @ManyToOne(targetEntity = Meals.class)
   private Meals meals;
 
-  private Integer count = 0;
+  private int count = 0;
 
   @OneToMany(mappedBy = "mealOptions", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JsonIgnore
   private Set<BookingsMealOptions> bookingsMealOptions = new HashSet<>();
+
+  @OneToMany(mappedBy = "mealOptions", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @JsonIgnore
+  private Set<AvailableBookings> availableBookings = new HashSet<>();
 
   public MealOptions(String name) {
     this.name = name;

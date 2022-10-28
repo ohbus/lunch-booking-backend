@@ -1,6 +1,9 @@
 package xyz.subho.lunchbooking.services.impl;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 import javax.transaction.Transactional;
@@ -10,16 +13,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
-import xyz.subho.lunchbooking.entities.Bookings;
-import xyz.subho.lunchbooking.entities.Meals;
-import xyz.subho.lunchbooking.entities.Roles;
-import xyz.subho.lunchbooking.entities.UserMetadata;
+import xyz.subho.lunchbooking.entities.*;
 import xyz.subho.lunchbooking.exceptions.BookingNotFoundException;
 import xyz.subho.lunchbooking.exceptions.InvalidBookingOperation;
 import xyz.subho.lunchbooking.exceptions.SelectionLockedException;
 import xyz.subho.lunchbooking.exceptions.SelectionNotAvailableException;
 import xyz.subho.lunchbooking.mapper.Mapper;
 import xyz.subho.lunchbooking.models.BookingResponseModel;
+import xyz.subho.lunchbooking.repositories.AvailableBookingsRepository;
 import xyz.subho.lunchbooking.repositories.BookingRepository;
 import xyz.subho.lunchbooking.services.BookingService;
 import xyz.subho.lunchbooking.services.MealsService;
@@ -30,6 +31,8 @@ import xyz.subho.lunchbooking.services.UserService;
 public class BookingServiceImpl implements BookingService {
 
   @Autowired private BookingRepository bookingRepository;
+
+  @Autowired private AvailableBookingsRepository availableBookingsRepository;
 
   @Autowired private MealsService mealsService;
 
@@ -92,8 +95,82 @@ public class BookingServiceImpl implements BookingService {
       throw new InvalidBookingOperation(String.format("Booking ID:%s is already cancelled!", id));
     }
     checkIfBookingOwnedByUser(booking, user);
-    mealsService.getMealOptionsByBookingId(id).removeBookingById(id);
+    var mealOption = mealsService.getMealOptionsByBookingId(id);
+    mealOption.removeBookingById(id);
+
+    // If the Booking is Cancelled after Locking the Meal
+    if (LocalDateTime.now()
+        .isAfter(
+            LocalDateTime.ofInstant(
+                Instant.ofEpochMilli(mealOption.getMeals().getLockedAt()),
+                ZoneId.systemDefault()))) {
+      // Available Meal Bookings for a particular day is created for broadcast
+      createAvailableMealForToday(mealOption);
+    }
     return booking.cancelBooking();
+  }
+
+  @Transactional
+  protected void createAvailableMealForToday(MealOptions mealOptions) {
+    var date = mealOptions.getMeals().getDate();
+    var availableBookingOpt =
+        availableBookingsRepository.findByDateAndMealOptions_Id(date, mealOptions.getId());
+    if (availableBookingOpt.isPresent()) {
+      // Adds another Meal which got cancelled
+      availableBookingOpt.get().add();
+    } else {
+      // If there is no available meal option, then creates one
+      availableBookingsRepository.save(new AvailableBookings(date, mealOptions));
+    }
+  }
+
+  @Override
+  @Transactional
+  public long claimAvailableMeal(long mealOptionId, long userId) {
+    var today = LocalDate.now();
+    // Checks if there is an existing booking for today
+    if (bookingRepository.existsByDateAndUser_IdAndCancelledAtNull(today, userId)) {
+      log.error("Booking Already Exists for User ID:{} on Date:{}", userId, today);
+      throw new InvalidBookingOperation(
+          String.format("Booking Already Exists for User ID:%s for Today:%s", userId, today));
+    }
+    // finds if there are any available meals
+    var availableBookingOpt =
+        availableBookingsRepository.findByDateAndMealOptions_Id(today, mealOptionId);
+    if (availableBookingOpt.isPresent()) {
+      var availableBooking = availableBookingOpt.get();
+      if (availableBooking.isAvailable()) {
+        var mealOption = mealsService.getMealOptionById(mealOptionId);
+        var mealOptionDay = mealOption.getMeals().getDate();
+        if (!today.isEqual(mealOptionDay)) {
+          log.error(
+              "Cannot Avail this Meal Today:{}. Can be only redeemed on:{}", today, mealOptionDay);
+          throw new SelectionNotAvailableException(
+              String.format(
+                  "Cannot Avail this Meal Today:%s. Can be only redeemed on:%s",
+                  today, mealOptionDay));
+        }
+        var user = userService.getUserById(userId);
+        var booking = new Bookings().withUser(user).withDate(mealOptionDay);
+        bookingRepository.save(booking);
+        log.debug(
+            "Created New Booking with ID:{} for User ID:{} with Meal Option ID:{}",
+            booking.getId(),
+            userId,
+            mealOptionId);
+        availableBooking.claim();
+        return booking.getId();
+      } else {
+        log.error(
+            "There are no available Meals for user ID:{}'s selection today:{}", userId, today);
+        throw new SelectionNotAvailableException(
+            String.format("There are no available Meals for your selection today:%s", today));
+      }
+    } else {
+      log.error("There are no available Meals for user ID:{}'s selection today:{}", userId, today);
+      throw new SelectionNotAvailableException(
+          String.format("There are no available Meals for your selection today:%s", today));
+    }
   }
 
   @Override

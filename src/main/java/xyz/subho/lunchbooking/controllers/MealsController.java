@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import xyz.subho.lunchbooking.entities.Roles;
+import xyz.subho.lunchbooking.models.AvailableOptionsResponseModel;
 import xyz.subho.lunchbooking.models.MealsModel;
 import xyz.subho.lunchbooking.services.MealsService;
 
@@ -59,5 +60,10 @@ public class MealsController {
   @Secured({Roles.ROLE_MANAGER, Roles.ROLE_ADMINISTRATOR, Roles.ROLE_CATERER})
   public List<MealsModel> getAllMeals(@PathVariable("today") Boolean today) {
     return mealsService.getAllMeals(today);
+  }
+
+  @GetMapping(EndpointPropertyKey.MEAL_AVAILABLE)
+  public List<AvailableOptionsResponseModel> getAllAvailableMeals() {
+    return mealsService.getAllAvailableOptionsForToday();
   }
 }

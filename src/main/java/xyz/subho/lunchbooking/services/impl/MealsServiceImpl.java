@@ -11,13 +11,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import xyz.subho.lunchbooking.entities.AvailableBookings;
 import xyz.subho.lunchbooking.entities.Bookings;
 import xyz.subho.lunchbooking.entities.MealOptions;
 import xyz.subho.lunchbooking.entities.Meals;
 import xyz.subho.lunchbooking.exceptions.*;
 import xyz.subho.lunchbooking.mapper.Mapper;
+import xyz.subho.lunchbooking.models.AvailableOptionsResponseModel;
 import xyz.subho.lunchbooking.models.BookingResponseModel;
 import xyz.subho.lunchbooking.models.MealsModel;
+import xyz.subho.lunchbooking.repositories.AvailableBookingsRepository;
 import xyz.subho.lunchbooking.repositories.BookingRepository;
 import xyz.subho.lunchbooking.repositories.MealOptionsRepository;
 import xyz.subho.lunchbooking.repositories.MealsRepository;
@@ -33,6 +36,8 @@ public class MealsServiceImpl implements MealsService {
 
   @Autowired private BookingRepository bookingRepository;
 
+  @Autowired private AvailableBookingsRepository availableBookingsRepository;
+
   @Autowired
   @Qualifier("MealDetailsMapper")
   private Mapper<Meals, MealsModel> mealsRequestModelMapper;
@@ -40,6 +45,11 @@ public class MealsServiceImpl implements MealsService {
   @Autowired
   @Qualifier("BookingResponseMapper")
   private Mapper<Bookings, BookingResponseModel> bookingResponseModelMapper;
+
+  @Autowired
+  @Qualifier("AvailableOptionsMapper")
+  private Mapper<AvailableBookings, AvailableOptionsResponseModel>
+      bookingsAvailableOptionsResponseModelMapper;
 
   @Override
   @Transactional
@@ -130,7 +140,7 @@ public class MealsServiceImpl implements MealsService {
       log.error("Meal:{} is already Locked!", mealId);
       throw new InvalidMealOperation(String.format("Meal:%s is already Locked!", meal.getName()));
     }
-    if (!LocalDate.now().equals(meal.getDate())) {
+    if (!LocalDate.now().isEqual(meal.getDate())) {
       log.error("Meal Date for:{} cannot be locked today!", meal.getDate());
       throw new InvalidMealOperation(
           String.format(
@@ -201,7 +211,7 @@ public class MealsServiceImpl implements MealsService {
           .filter(
               mealsModel ->
                   bookingsList.stream()
-                      .anyMatch(bookings -> bookings.date().equals(mealsModel.getDate())))
+                      .anyMatch(bookings -> bookings.date().isEqual(mealsModel.getDate())))
           .forEach(
               mealsModel ->
                   mealsModel.getMealOptions().stream()
@@ -225,5 +235,14 @@ public class MealsServiceImpl implements MealsService {
     return !result.isEmpty()
         ? result.stream().map(meals -> mealsRequestModelMapper.transform(meals)).toList()
         : new ArrayList<>();
+  }
+
+  @Override
+  public List<AvailableOptionsResponseModel> getAllAvailableOptionsForToday() {
+    return availableBookingsRepository.findByDateOrderByCountDesc(LocalDate.now()).stream()
+        .map(
+            availableBookings ->
+                bookingsAvailableOptionsResponseModelMapper.transform(availableBookings))
+        .toList();
   }
 }
