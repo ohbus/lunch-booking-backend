@@ -182,17 +182,17 @@ public class MealsServiceImpl implements MealsService {
   @Override
   public List<MealsModel> getMealsAvailableForBookingWithAlreadyMarkedBookings(long userId) {
     var today = LocalDate.now();
-    var mealEntityList =
-        mealsRepository
-            .findByDateGreaterThanEqualAndLockedAtNullAndActivatedAtNotNullOrderByDateAsc(today);
-
     var mealList =
-        mealEntityList.stream().map(meals -> mealsRequestModelMapper.transform(meals)).toList();
+        mealsRepository
+            .findByDateGreaterThanEqualAndLockedAtNullAndActivatedAtNotNullOrderByDateAsc(today)
+            .stream()
+            .map(meals -> mealsRequestModelMapper.transform(meals))
+            .toList();
 
     if (!mealList.isEmpty()) {
       var bookingsList =
           bookingRepository
-              .findByDateGreaterThanEqualAndUser_IdOrderByDateAsc(today, userId)
+              .findByDateGreaterThanEqualAndUser_IdAndCancelledAtNullOrderByDateAsc(today, userId)
               .stream()
               .map(bookings -> bookingResponseModelMapper.transform(bookings))
               .toList();
@@ -210,9 +210,7 @@ public class MealsServiceImpl implements MealsService {
                               bookingsList.stream()
                                   .anyMatch(
                                       bookings ->
-                                          bookings
-                                              .mealOption()
-                                              .equalsIgnoreCase(mealOptionsModel.getName())))
+                                          bookings.mealOptionId().equals(mealOptionsModel.getId())))
                       .forEach(mealOptionsModel -> mealOptionsModel.setSelected(Boolean.TRUE)));
     }
     return mealList;

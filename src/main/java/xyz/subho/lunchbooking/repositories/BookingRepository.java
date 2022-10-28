@@ -17,14 +17,17 @@ public interface BookingRepository extends JpaRepository<Bookings, Long> {
   Optional<Bookings> findByDateAndUser_IdAndCancelledAtNull(
       @NonNull LocalDate date, @NonNull Long id);
 
-  List<Bookings> findByDateLessThanAndUser_IdOrderByDateDesc(
+  List<Bookings> findByDateLessThanAndUser_IdAndCancelledAtNullOrderByDateDesc(
       @NonNull LocalDate date, @NonNull Long id);
 
-  List<Bookings> findByDateGreaterThanAndUser_IdOrderByDateAsc(
+  List<Bookings> findByDateGreaterThanAndUser_IdAndCancelledAtNullOrderByDateAsc(
       @NonNull LocalDate date, @NonNull Long id);
 
   List<Bookings> findByDateGreaterThanEqualAndUser_IdOrderByDateAsc(
       @NonNull LocalDate date, @NonNull Long id);
 
-  List<Bookings> findByDate(@NonNull LocalDate date);
+  List<Bookings> findByDateGreaterThanEqualAndUser_IdAndCancelledAtNullOrderByDateAsc(
+      @NonNull LocalDate date, @NonNull Long id);
+
+  List<Bookings> findByDateAndCancelledAtNull(@NonNull LocalDate date);
 }
