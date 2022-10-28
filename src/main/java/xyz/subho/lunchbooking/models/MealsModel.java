@@ -26,6 +26,10 @@ public class MealsModel implements Serializable {
   @NotNull(message = "Date Field cannot be null")
   private LocalDate date;
 
+  private Long activatedAt;
+
+  private Long lockedAt;
+
   @Size(min = 1, message = "Meal Options should contain greater than equals to 1 option")
   private Set<MealOptionsModel> mealOptions = new HashSet<>();
 

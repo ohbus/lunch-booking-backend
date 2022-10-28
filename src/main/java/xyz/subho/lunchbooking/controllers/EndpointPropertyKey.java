@@ -12,7 +12,10 @@ public final class EndpointPropertyKey {
   public static final String MEAL_CREATE = "/meal/create";
   public static final String MEAL_ACTIVATE = "/meal/activate/{mealId}";
   public static final String MEAL_LOCK = "/meal/lock/{mealId}";
+  public static final String MEAL_FOR_USERS = "/meal";
+  public static final String MEALS = "/meal/{today}";
 
+  public static final String BOOKING_FOR_TODAY = "/booking";
   public static final String BOOKING_CREATE = "/booking/create/{mealOptionId}";
   public static final String BOOKING_AVAIL = "/booking/avail/{bookingId}";
   public static final String BOOKING_DELETE = "/booking/{bookingId}";

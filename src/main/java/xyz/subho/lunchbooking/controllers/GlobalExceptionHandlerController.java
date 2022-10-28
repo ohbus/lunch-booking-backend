@@ -1,9 +1,15 @@
 package xyz.subho.lunchbooking.controllers;
 
+import com.nimbusds.jose.shaded.json.JSONObject;
+import com.nimbusds.jose.shaded.json.JSONStyle;
+import java.util.HashMap;
+import java.util.Map;
 import javax.validation.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import xyz.subho.lunchbooking.exceptions.*;
@@ -51,11 +57,31 @@ public class GlobalExceptionHandlerController {
     return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
   }
 
+  @ExceptionHandler({MethodArgumentNotValidException.class})
+  public ResponseEntity<ErrorDetails> handleAsMethodArgumentNotValid(
+      MethodArgumentNotValidException ex) {
+
+    Map<String, String> errorMap = new HashMap<>();
+    ex.getBindingResult()
+        .getFieldErrors()
+        .forEach(fieldError -> errorMap.put(fieldError.getField(), fieldError.getDefaultMessage()));
+    ErrorDetails errorDetails =
+        new ErrorDetails(new JSONObject(errorMap).toJSONString(JSONStyle.MAX_COMPRESS));
+    return new ResponseEntity<>(errorDetails, HttpStatus.UNPROCESSABLE_ENTITY);
+  }
+
   @ExceptionHandler({HttpMessageNotReadableException.class, ValidationException.class})
   public ResponseEntity<ErrorDetails> handleAsUnpronounceableEntity(Exception ex) {
 
     ErrorDetails errorDetails = new ErrorDetails(ex.getMessage());
     return new ResponseEntity<>(errorDetails, HttpStatus.UNPROCESSABLE_ENTITY);
+  }
+
+  @ExceptionHandler({HttpMediaTypeNotSupportedException.class})
+  public ResponseEntity<ErrorDetails> handleAsMediaTypeNotSupported(Exception ex) {
+
+    ErrorDetails errorDetails = new ErrorDetails(ex.getMessage());
+    return new ResponseEntity<>(errorDetails, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
   }
 
   @ExceptionHandler({

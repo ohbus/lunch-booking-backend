@@ -1,5 +1,6 @@
 package xyz.subho.lunchbooking.services;
 
+import java.util.List;
 import org.springframework.lang.NonNull;
 import xyz.subho.lunchbooking.entities.MealOptions;
 import xyz.subho.lunchbooking.entities.Meals;
@@ -19,11 +20,15 @@ public interface MealsService {
 
   public MealOptions getMealOptionsByBookingId(long id);
 
-  public void lockMeal(long mealId);
+  public MealsModel lockMeal(long mealId);
 
-  public void unlockMeal(long mealId);
+  public MealsModel unlockMeal(long mealId);
 
-  public void activateMeal(long mealId);
+  public MealsModel activateMeal(long mealId);
 
-  public void deactivateMeal(long mealId);
+  public MealsModel deactivateMeal(long mealId);
+
+  public List<MealsModel> getMealsAvailableForBookingWithAlreadyMarkedBookings(long userId);
+
+  public List<MealsModel> getAllMeals(boolean today);
 }

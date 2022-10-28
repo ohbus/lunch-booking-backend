@@ -58,7 +58,9 @@ public class BookingServiceImpl implements BookingService {
           userId,
           date);
       existingBooking.cancelBooking();
-      mealOption.removeBooking(existingBooking);
+      mealsService
+          .getMealOptionsByBookingId(existingBooking.getId())
+          .removeBooking(existingBooking);
     }
     var booking = new Bookings().withUser(user).withDate(date);
     log.debug("Creating Booking for UserID:{} and Meal Options ID:{}", userId, mealOptionId);
@@ -137,15 +139,12 @@ public class BookingServiceImpl implements BookingService {
 
   @Override
   @Transactional
-  @Secured({Roles.ROLE_CATERER, Roles.ROLE_MANAGER, Roles.ROLE_ADMINISTRATOR})
-  public BookingResponseModel availBooking(long id, long userId) {
+  public BookingResponseModel availBooking(long id) {
     var booking = getBookingById(id);
-    var user = userService.getUserById(userId);
     if (Objects.nonNull(booking.getClaimedAt())) {
       log.error("Booking ID:{} is already claimed!", id);
       throw new InvalidBookingOperation(String.format("Booking ID:%s is already claimed!", id));
     }
-    checkIfBookingOwnedByUser(booking, user);
     booking.availBooking();
     return bookingResponseModelMapper.transform(booking);
   }
@@ -154,7 +153,7 @@ public class BookingServiceImpl implements BookingService {
   public BookingResponseModel getCurrentBooking(long userId) {
     var today = LocalDate.now();
     log.debug("Finding Booking for User ID:{} for Today:{}", userId, today);
-    var bookingOpt = bookingRepository.findByUser_IdAndDate(userId, today);
+    var bookingOpt = bookingRepository.findByDateAndUser_IdAndCancelledAtNull(today, userId);
     if (bookingOpt.isEmpty()) {
       log.error("User ID:{} does not have booking for today:{}", userId, today);
       throw new BookingNotFoundException("Booking Not Found for today.");
@@ -169,7 +168,8 @@ public class BookingServiceImpl implements BookingService {
     var today = LocalDate.now();
     log.debug("Finding Upcoming Bookings for User ID:{} after today:{}", userId, today);
     var bookingList =
-        bookingRepository.findByDateGreaterThanAndUser_IdOrderByDateAsc(today, userId);
+        bookingRepository.findByDateGreaterThanAndUser_IdAndCancelledAtNullOrderByDateAsc(
+            today, userId);
     log.debug("Found {} Bookings for User ID:{} after today:{}", bookingList.size(), userId, today);
     return bookingList.stream()
         .map(booking -> bookingResponseModelMapper.transform(booking))
@@ -180,7 +180,9 @@ public class BookingServiceImpl implements BookingService {
   public List<BookingResponseModel> getPreviousBookings(long userId) {
     var today = LocalDate.now();
     log.debug("Finding Previous Bookings for User ID:{} before today:{}", userId, today);
-    var bookingList = bookingRepository.findByDateLessThanAndUser_IdOrderByDateDesc(today, userId);
+    var bookingList =
+        bookingRepository.findByDateLessThanAndUser_IdAndCancelledAtNullOrderByDateDesc(
+            today, userId);
     log.debug(
         "Found {} Bookings for User ID:{} before today:{}", bookingList.size(), userId, today);
     return bookingList.stream()
@@ -191,7 +193,7 @@ public class BookingServiceImpl implements BookingService {
   @Override
   public List<BookingResponseModel> getBookingsByDate(LocalDate date) {
     log.debug("Finding Bookings on Date:{}", date);
-    var bookingList = bookingRepository.findByDate(date);
+    var bookingList = bookingRepository.findByDateAndCancelledAtNull(date);
     log.debug("Found {} Bookings on Date:{}", bookingList.size(), date);
     return bookingList.stream()
         .map(booking -> bookingResponseModelMapper.transform(booking))

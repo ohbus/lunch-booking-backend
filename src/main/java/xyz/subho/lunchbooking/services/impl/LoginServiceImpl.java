@@ -57,10 +57,7 @@ public class LoginServiceImpl implements LoginService, UserDetailsService {
   public void createUser(UserRegistrationModel user) {
 
     log.debug("Starting User Registration for:{}", user.getEmailId());
-    if (checkIfUserExists(user.getEmailId())) {
-      log.error("Email ID already exists for {}", user.getEmailId());
-      throw new InvalidUsernameException("Email ID already exists");
-    }
+    checkIfUserExists(user.getEmailId(), user.getMobile());
 
     var userDetails =
         new UserMetadata()
@@ -88,8 +85,14 @@ public class LoginServiceImpl implements LoginService, UserDetailsService {
     log.debug("Created Login Details for User ID:{}", userLogin.getId());
   }
 
-  private boolean checkIfUserExists(String username) {
-    return loginRepository.existsByUsername(username);
+  private void checkIfUserExists(String username, String mobile) {
+    if (loginRepository.existsByUsername(username)) {
+      log.error("Email ID already exists for {}", username);
+      throw new InvalidUsernameException("Email ID already exists");
+    } else if (metadataRepository.existsByMobileIgnoreCase(mobile)) {
+      log.error("Mobile Number already exists for {}", mobile);
+      throw new InvalidUsernameException("Mobile Number already exists");
+    }
   }
 
   @Transactional

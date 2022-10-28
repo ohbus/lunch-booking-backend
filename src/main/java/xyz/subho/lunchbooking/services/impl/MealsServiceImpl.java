@@ -1,6 +1,8 @@
 package xyz.subho.lunchbooking.services.impl;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import javax.transaction.Transactional;
@@ -9,11 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import xyz.subho.lunchbooking.entities.Bookings;
 import xyz.subho.lunchbooking.entities.MealOptions;
 import xyz.subho.lunchbooking.entities.Meals;
 import xyz.subho.lunchbooking.exceptions.*;
 import xyz.subho.lunchbooking.mapper.Mapper;
+import xyz.subho.lunchbooking.models.BookingResponseModel;
 import xyz.subho.lunchbooking.models.MealsModel;
+import xyz.subho.lunchbooking.repositories.BookingRepository;
 import xyz.subho.lunchbooking.repositories.MealOptionsRepository;
 import xyz.subho.lunchbooking.repositories.MealsRepository;
 import xyz.subho.lunchbooking.services.MealsService;
@@ -26,9 +31,15 @@ public class MealsServiceImpl implements MealsService {
 
   @Autowired private MealOptionsRepository mealOptionsRepository;
 
+  @Autowired private BookingRepository bookingRepository;
+
   @Autowired
   @Qualifier("MealDetailsMapper")
   private Mapper<Meals, MealsModel> mealsRequestModelMapper;
+
+  @Autowired
+  @Qualifier("BookingResponseMapper")
+  private Mapper<Bookings, BookingResponseModel> bookingResponseModelMapper;
 
   @Override
   @Transactional
@@ -112,7 +123,8 @@ public class MealsServiceImpl implements MealsService {
   }
 
   @Override
-  public void lockMeal(long mealId) {
+  @Transactional
+  public MealsModel lockMeal(long mealId) {
     var meal = getMealById(mealId);
     if (meal.isLocked()) {
       log.error("Meal:{} is already Locked!", mealId);
@@ -126,31 +138,37 @@ public class MealsServiceImpl implements MealsService {
               meal.getName(), meal.getDate()));
     }
     meal.lock();
+    return mealsRequestModelMapper.transform(meal);
   }
 
   @Override
-  public void unlockMeal(long mealId) {
+  @Transactional
+  public MealsModel unlockMeal(long mealId) {
     var meal = getMealById(mealId);
     if (!meal.isLocked()) {
       log.error("Meal:{} is not Locked!", mealId);
       throw new InvalidMealOperation(String.format("Meal:%s is not Locked!", meal.getName()));
     }
     meal.lock();
+    return mealsRequestModelMapper.transform(meal);
   }
 
   @Override
-  public void activateMeal(long mealId) {
+  @Transactional
+  public MealsModel activateMeal(long mealId) {
     var meal = getMealById(mealId);
     if (meal.isActivated()) {
       log.error("Meal:{} is already Activated!", mealId);
       throw new InvalidMealOperation(
           String.format("Meal:%s is already Activated!", meal.getName()));
     }
-    meal.deactivate();
+    meal.activate();
+    return mealsRequestModelMapper.transform(meal);
   }
 
   @Override
-  public void deactivateMeal(long mealId) {
+  @Transactional
+  public MealsModel deactivateMeal(long mealId) {
     var meal = getMealById(mealId);
     if (!meal.isActivated()) {
       log.error("Meal:{} is already Deactivated!", mealId);
@@ -158,5 +176,54 @@ public class MealsServiceImpl implements MealsService {
           String.format("Meal:%s is already Deactivated!", meal.getName()));
     }
     meal.deactivate();
+    return mealsRequestModelMapper.transform(meal);
+  }
+
+  @Override
+  public List<MealsModel> getMealsAvailableForBookingWithAlreadyMarkedBookings(long userId) {
+    var today = LocalDate.now();
+    var mealList =
+        mealsRepository
+            .findByDateGreaterThanEqualAndLockedAtNullAndActivatedAtNotNullOrderByDateAsc(today)
+            .stream()
+            .map(meals -> mealsRequestModelMapper.transform(meals))
+            .toList();
+
+    if (!mealList.isEmpty()) {
+      var bookingsList =
+          bookingRepository
+              .findByDateGreaterThanEqualAndUser_IdAndCancelledAtNullOrderByDateAsc(today, userId)
+              .stream()
+              .map(bookings -> bookingResponseModelMapper.transform(bookings))
+              .toList();
+
+      mealList.stream()
+          .filter(
+              mealsModel ->
+                  bookingsList.stream()
+                      .anyMatch(bookings -> bookings.date().equals(mealsModel.getDate())))
+          .forEach(
+              mealsModel ->
+                  mealsModel.getMealOptions().stream()
+                      .filter(
+                          mealOptionsModel ->
+                              bookingsList.stream()
+                                  .anyMatch(
+                                      bookings ->
+                                          bookings.mealOptionId().equals(mealOptionsModel.getId())))
+                      .forEach(mealOptionsModel -> mealOptionsModel.setSelected(Boolean.TRUE)));
+    }
+    return mealList;
+  }
+
+  @Override
+  public List<MealsModel> getAllMeals(boolean today) {
+    List<Meals> result = null;
+    var date = LocalDate.now();
+    if (today) result = mealsRepository.findByDateGreaterThanEqualOrderByDateAsc(date);
+    else result = mealsRepository.findByDateLessThanOrderByDateDesc(date);
+    return !result.isEmpty()
+        ? result.stream().map(meals -> mealsRequestModelMapper.transform(meals)).toList()
+        : new ArrayList<>();
   }
 }

@@ -1,5 +1,6 @@
 package xyz.subho.lunchbooking.mapper;
 
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 import xyz.subho.lunchbooking.entities.Bookings;
 import xyz.subho.lunchbooking.entities.UserMetadata;
@@ -10,15 +11,22 @@ public class BookingResponseMapper implements Mapper<Bookings, BookingResponseMo
 
   @Override
   public BookingResponseModel transform(Bookings source) {
+    Pair<Long, String> mealOptionIdNamePair =
+        source.getBookingsMealOptions().stream()
+            .map(
+                bookingsMealOptions ->
+                    Pair.of(
+                        bookingsMealOptions.getMealOptions().getId(),
+                        bookingsMealOptions.getMealOptions().getName()))
+            .findFirst()
+            .orElseGet(() -> Pair.of(0L, ""));
     return new BookingResponseModel(
         source.getId(),
         source.getUser().getFirstName(),
         source.getUser().getLastName(),
         source.getDate(),
-        source.getBookingsMealOptions().stream()
-            .map(bookingsMealOptions -> bookingsMealOptions.getMealOptions().getName())
-            .findFirst()
-            .orElseGet(() -> ""),
+        mealOptionIdNamePair.getSecond(),
+        mealOptionIdNamePair.getFirst(),
         source.getClaimedAt());
   }
 
