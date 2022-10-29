@@ -24,15 +24,32 @@
 		<license-maven-plugin.version>4.1</license-maven-plugin.version>
 		<auth0-jwt.version>4.2.1</auth0-jwt.version>
 		<commons-lang3.version>3.12.0</commons-lang3.version>
+		<zxing.version>3.5.0</zxing.version>
 		<jacoco.version>0.8.8</jacoco.version>
 		<sonar.projectKey>ohbus_lunch-booking-backend</sonar.projectKey>
 		<sonar.organization>ohbus</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
 	<dependencies>
+		<!-- https://mvnrepository.com/artifact/com.google.zxing/core -->
+		<dependency>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>core</artifactId>
+			<version>${zxing.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.google.zxing/javase -->
+		<dependency>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>javase</artifactId>
+			<version>${zxing.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
