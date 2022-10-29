@@ -50,6 +50,18 @@ public class MealsController {
     return mealsService.unlockMeal(mealId);
   }
 
+  @PutMapping(EndpointPropertyKey.MEAL_READY)
+  @Secured({Roles.ROLE_MANAGER, Roles.ROLE_ADMINISTRATOR})
+  public MealsModel readyMeal(@PathVariable("mealId") long mealId) {
+    return mealsService.makeMealReady(mealId);
+  }
+
+  @DeleteMapping(EndpointPropertyKey.MEAL_READY)
+  @Secured({Roles.ROLE_MANAGER, Roles.ROLE_ADMINISTRATOR})
+  public MealsModel unReadyMeal(@PathVariable("mealId") long mealId) {
+    return mealsService.makeMealUnready(mealId);
+  }
+
   @GetMapping(EndpointPropertyKey.MEAL_FOR_USERS)
   public List<MealsModel> prepareMealListForUser(Principal principal) {
     return mealsService.getMealsAvailableForBookingWithAlreadyMarkedBookings(

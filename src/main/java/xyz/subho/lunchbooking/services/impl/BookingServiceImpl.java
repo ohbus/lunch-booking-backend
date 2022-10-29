@@ -23,6 +23,7 @@ import xyz.subho.lunchbooking.mapper.Mapper;
 import xyz.subho.lunchbooking.models.BookingResponseModel;
 import xyz.subho.lunchbooking.repositories.AvailableBookingsRepository;
 import xyz.subho.lunchbooking.repositories.BookingRepository;
+import xyz.subho.lunchbooking.repositories.MealsRepository;
 import xyz.subho.lunchbooking.services.BookingService;
 import xyz.subho.lunchbooking.services.MealsService;
 import xyz.subho.lunchbooking.services.UserService;
@@ -34,6 +35,8 @@ public class BookingServiceImpl implements BookingService {
   @Autowired private BookingRepository bookingRepository;
 
   @Autowired private AvailableBookingsRepository availableBookingsRepository;
+
+  @Autowired private MealsRepository mealsRepository;
 
   @Autowired private MealsService mealsService;
 
@@ -224,6 +227,25 @@ public class BookingServiceImpl implements BookingService {
     if (Objects.nonNull(booking.getClaimedAt())) {
       log.error("Booking ID:{} is already claimed!", id);
       throw new InvalidBookingOperation(String.format("Booking ID:%s is already claimed!", id));
+    }
+    var mealOpt =
+        mealsRepository.findByDateAndMealOptions_BookingsMealOptions_Bookings(
+            booking.getDate(), booking);
+    if (mealOpt.isPresent()) {
+      var meal = mealOpt.get();
+      if (!meal.isReady()) {
+        log.error(
+            "Meal:{} with ID:{} is NOT ready for Booking ID:{}",
+            meal.getName(),
+            meal.getId(),
+            booking.getId());
+        throw new InvalidBookingOperation(
+            String.format("Meal:%s is NOT Ready yet!", meal.getName()));
+      }
+      log.debug("Meal is Marked Ready for Booking ID:{}", booking.getId());
+    } else {
+      log.error("Meal is not present for Booking ID{}", booking.getId());
+      throw new InvalidBookingOperation("Meal is not present for this Booking");
     }
     booking.availBooking();
     return bookingResponseModelMapper.transform(booking);

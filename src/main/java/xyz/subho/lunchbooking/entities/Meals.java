@@ -42,6 +42,8 @@ public class Meals extends BaseEntity implements Serializable {
 
   private Long lockedAt;
 
+  private Long readyAt;
+
   @OneToMany(mappedBy = "meals", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JsonIgnore
   @ToString.Exclude
@@ -58,6 +60,18 @@ public class Meals extends BaseEntity implements Serializable {
 
   public boolean isLocked() {
     return Objects.nonNull(lockedAt);
+  }
+
+  public void markReady() {
+    readyAt = System.currentTimeMillis();
+  }
+
+  public void markUnReady() {
+    readyAt = null;
+  }
+
+  public boolean isReady() {
+    return Objects.nonNull(readyAt);
   }
 
   public long activate() {

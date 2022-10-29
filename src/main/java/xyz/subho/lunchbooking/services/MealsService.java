@@ -29,6 +29,10 @@ public interface MealsService {
 
   public MealsModel deactivateMeal(long mealId);
 
+  public MealsModel makeMealReady(long mealId);
+
+  public MealsModel makeMealUnready(long mealId);
+
   public List<MealsModel> getMealsAvailableForBookingWithAlreadyMarkedBookings(long userId);
 
   public List<MealsModel> getAllMeals(boolean today);

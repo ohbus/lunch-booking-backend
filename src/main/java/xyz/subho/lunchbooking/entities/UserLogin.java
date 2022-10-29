@@ -47,11 +47,11 @@ public class UserLogin extends BaseEntity implements UserDetails, Serializable {
   @Column(columnDefinition = "boolean default false", nullable = false)
   private boolean credentialExpired = false;
 
-  @Column(columnDefinition = "boolean default true", nullable = false)
-  private boolean enabled = true;
+  @Column(columnDefinition = "boolean default false", nullable = false)
+  private boolean enabled = false;
 
   @Column(columnDefinition = "boolean default false", nullable = false)
-  private Boolean secured = false;
+  private boolean secured = false;
 
   @Basic private Long currentLogin;
 

@@ -30,6 +30,8 @@ public class MealsModel implements Serializable {
 
   private Long lockedAt;
 
+  private Long readyAt;
+
   @Size(min = 1, message = "Meal Options should contain greater than equals to 1 option")
   private Set<MealOptionsModel> mealOptions = new HashSet<>();
 

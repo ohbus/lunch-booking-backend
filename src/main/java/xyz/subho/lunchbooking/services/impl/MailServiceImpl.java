@@ -12,6 +12,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import xyz.subho.lunchbooking.models.Email;
 import xyz.subho.lunchbooking.services.MailService;
 
@@ -38,6 +39,8 @@ public class MailServiceImpl implements MailService {
   public void sendMail(@NonNull Email email) {
 
     MimeMessage message = mailSender.createMimeMessage();
+
+    if (CollectionUtils.isEmpty(email.getRecipients())) log.error("Re");
 
     try {
       MimeMessageHelper helper =
@@ -69,8 +72,10 @@ public class MailServiceImpl implements MailService {
 
       mailSender.send(message);
       log.debug("Mail Sent to:{}", email.getRecipients().toString());
-    } catch (MessagingException | UnsupportedEncodingException e) {
+    } catch (MessagingException | UnsupportedEncodingException | RuntimeException e) {
       log.error("Could not send email due to {}", e.getMessage());
     }
   }
+
+  private void validateEmail(@NonNull Email email) {}
 }

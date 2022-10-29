@@ -5,11 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import javax.mail.util.ByteArrayDataSource;
 import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.lang.NonNull;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import xyz.subho.lunchbooking.entities.AvailableBookings;
 import xyz.subho.lunchbooking.entities.Bookings;
@@ -19,16 +21,21 @@ import xyz.subho.lunchbooking.exceptions.*;
 import xyz.subho.lunchbooking.mapper.Mapper;
 import xyz.subho.lunchbooking.models.AvailableOptionsResponseModel;
 import xyz.subho.lunchbooking.models.BookingResponseModel;
+import xyz.subho.lunchbooking.models.Email;
 import xyz.subho.lunchbooking.models.MealsModel;
 import xyz.subho.lunchbooking.repositories.AvailableBookingsRepository;
 import xyz.subho.lunchbooking.repositories.BookingRepository;
 import xyz.subho.lunchbooking.repositories.MealOptionsRepository;
 import xyz.subho.lunchbooking.repositories.MealsRepository;
+import xyz.subho.lunchbooking.services.MailService;
 import xyz.subho.lunchbooking.services.MealsService;
+import xyz.subho.lunchbooking.util.QRUtil;
 
 @Slf4j
 @Service
 public class MealsServiceImpl implements MealsService {
+
+  @Autowired private MailService mailService;
 
   @Autowired private MealsRepository mealsRepository;
 
@@ -140,6 +147,10 @@ public class MealsServiceImpl implements MealsService {
       log.error("Meal:{} is already Locked!", mealId);
       throw new InvalidMealOperation(String.format("Meal:%s is already Locked!", meal.getName()));
     }
+    if (!meal.isActivated()) {
+      log.error("Meal:{} is being tried to lock before being activated!", mealId);
+      throw new InvalidMealOperation(String.format("Meal:%s is not Activated!", meal.getName()));
+    }
     if (!LocalDate.now().isEqual(meal.getDate())) {
       log.error("Meal Date for:{} cannot be locked today!", meal.getDate());
       throw new InvalidMealOperation(
@@ -159,7 +170,7 @@ public class MealsServiceImpl implements MealsService {
       log.error("Meal:{} is not Locked!", mealId);
       throw new InvalidMealOperation(String.format("Meal:%s is not Locked!", meal.getName()));
     }
-    meal.lock();
+    meal.unlock();
     return mealsRequestModelMapper.transform(meal);
   }
 
@@ -186,6 +197,69 @@ public class MealsServiceImpl implements MealsService {
           String.format("Meal:%s is already Deactivated!", meal.getName()));
     }
     meal.deactivate();
+    return mealsRequestModelMapper.transform(meal);
+  }
+
+  @Override
+  @Transactional
+  public MealsModel makeMealReady(long mealId) {
+    var meal = getMealById(mealId);
+    if (meal.isReady()) {
+      log.error("Meal:{} is already Ready!", mealId);
+      throw new InvalidMealOperation(String.format("Meal:%s is already Ready!", meal.getName()));
+    }
+    if (!meal.isLocked()) {
+      log.error("Meal:{} is being tried to make READY before being locked!", mealId);
+      throw new InvalidMealOperation(String.format("Meal:%s is not Locked!", meal.getName()));
+    }
+    if (!LocalDate.now().isEqual(meal.getDate())) {
+      log.error("Meal Date for:{} cannot be marked Ready today!", meal.getDate());
+      throw new InvalidMealOperation(
+          String.format(
+              "Cannot Ready Meal:%s today. Can be marked Ready only on:%s",
+              meal.getName(), meal.getDate()));
+    }
+    meal.markReady();
+    sendReadyEmails(meal);
+    return mealsRequestModelMapper.transform(meal);
+  }
+
+  @Async
+  protected void sendReadyEmails(Meals meal) {
+
+    var bookingList = bookingRepository.findByDateAndCancelledAtNull(meal.getDate());
+
+    bookingList.forEach(
+        booking -> {
+          var user = booking.getUser();
+          var bookingModel = bookingResponseModelMapper.transform(booking);
+          var bookingId = Long.toString(booking.getId());
+
+          mailService.sendMail(
+              new Email(
+                  user.getEmailId(),
+                  String.format("Lunch QR Code for %s", booking.getDate()),
+                  String.format(
+                      "Hey %s %s!%nPFA QR Code for your today's meal %s with Option %s.",
+                      bookingModel.firstName(),
+                      bookingModel.lastName(),
+                      meal.getName(),
+                      bookingModel.mealOption()),
+                  bookingId + ".png",
+                  new ByteArrayDataSource(
+                      QRUtil.getQRCodeImage(bookingId, 500, 500), "application/octet-stream")));
+        });
+  }
+
+  @Override
+  @Transactional
+  public MealsModel makeMealUnready(long mealId) {
+    var meal = getMealById(mealId);
+    if (!meal.isReady()) {
+      log.error("Meal:{} is not Ready!", mealId);
+      throw new InvalidMealOperation(String.format("Meal:%s is not Ready!", meal.getName()));
+    }
+    meal.markUnReady();
     return mealsRequestModelMapper.transform(meal);
   }
 
