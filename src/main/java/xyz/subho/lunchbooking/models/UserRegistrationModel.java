@@ -43,6 +43,7 @@ public class UserRegistrationModel implements Serializable {
   private String emailId;
 
   @NotBlank(message = "Password field cannot be blank")
+  @Size(min = 8, max = 32, message = "Password needs to me between 8 and 32 characters")
   private String password;
 
   @NotBlank(message = "First Name field cannot be blank")

@@ -19,15 +19,15 @@
 package xyz.subho.lunchbooking.services.impl;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 import javax.mail.util.ByteArrayDataSource;
 import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.util.Pair;
 import org.springframework.lang.NonNull;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -37,10 +37,7 @@ import xyz.subho.lunchbooking.entities.MealOptions;
 import xyz.subho.lunchbooking.entities.Meals;
 import xyz.subho.lunchbooking.exceptions.*;
 import xyz.subho.lunchbooking.mapper.Mapper;
-import xyz.subho.lunchbooking.models.AvailableOptionsResponseModel;
-import xyz.subho.lunchbooking.models.BookingResponseModel;
-import xyz.subho.lunchbooking.models.Email;
-import xyz.subho.lunchbooking.models.MealsModel;
+import xyz.subho.lunchbooking.models.*;
 import xyz.subho.lunchbooking.repositories.AvailableBookingsRepository;
 import xyz.subho.lunchbooking.repositories.BookingRepository;
 import xyz.subho.lunchbooking.repositories.MealOptionsRepository;
@@ -76,10 +73,16 @@ public class MealsServiceImpl implements MealsService {
   private Mapper<AvailableBookings, AvailableOptionsResponseModel>
       bookingsAvailableOptionsResponseModelMapper;
 
+  @Value("${custom.mail.manager.to.addresses:hello@subho.xyz}")
+  private String managerToAddresses;
+
+  @Value("${custom.mail.manager.cc.addresses}")
+  private String managerCcAddresses;
+
   @Override
   @Transactional
   public MealsModel createMeal(@NonNull MealsModel mealsModel) {
-    log.debug("Creating Meals:{}", mealsModel.toString());
+    log.debug("Creating Meals:{}", mealsModel);
     if (mealsRepository.existsByDate(mealsModel.getDate())) {
       log.error("Meal already exists for the date:{}", mealsModel.getDate());
       throw new SelectionNotAvailableException(
@@ -179,7 +182,9 @@ public class MealsServiceImpl implements MealsService {
     }
     meal.lock();
     log.debug("Meal ID:{} is being Locked", mealId);
-    return mealsRequestModelMapper.transform(meal);
+    var mealModel = mealsRequestModelMapper.transform(meal);
+    sendCountEmails(mealModel);
+    return mealModel;
   }
 
   @Override
@@ -252,6 +257,36 @@ public class MealsServiceImpl implements MealsService {
   }
 
   @Async
+  protected void sendCountEmails(MealsModel meal) {
+    var email = new Email();
+    var totalCount =
+        meal.getMealOptions().stream()
+            .map(MealOptionsModel::getCount)
+            .mapToInt(Integer::intValue)
+            .sum();
+
+    var bodyPrelude =
+        String.format("Hi,%n%nMeal Details: %s%nOptions with Count as follows:%n", meal.getName());
+    var bodyInterlude =
+        meal.getMealOptions().stream()
+            .map(
+                mealOptionsModel ->
+                    Pair.of(mealOptionsModel.getName(), mealOptionsModel.getCount()))
+            .map(
+                mealOption ->
+                    String.format("%s :: %s", mealOption.getFirst(), mealOption.getSecond()))
+            .collect(Collectors.joining("\n"));
+    var bodyPostlude = String.format("%n%nTotal Count :: %s%n%nCheers.", totalCount);
+
+    new ArrayList<>(Arrays.asList(managerToAddresses.split(","))).forEach(email::addRecipient);
+    new ArrayList<>(Arrays.asList(managerCcAddresses.split(","))).forEach(email::addCc);
+    email.setSubject(String.format("Lunch Booking for %s", meal.getDate()));
+    email.setBody(String.format("%s%s%s", bodyPrelude, bodyInterlude, bodyPostlude));
+
+    mailService.sendMail(email);
+  }
+
+  @Async
   protected void sendReadyEmails(Meals meal) {
 
     var bookingList = bookingRepository.findByDateAndCancelledAtNull(meal.getDate());
@@ -266,9 +301,9 @@ public class MealsServiceImpl implements MealsService {
           mailService.sendMail(
               new Email(
                   user.getEmailId(),
-                  String.format("Lunch QR Code for %s", booking.getDate()),
+                  String.format("Lunch is Ready for Today %s", booking.getDate()),
                   String.format(
-                      "Hey %s %s!%nPFA QR Code for your today's meal %s with Option %s.",
+                      "Hey %s %s,%n%nPFA Coupon for your today's meal %s with Option %s.%n%nCheers!!",
                       bookingModel.firstName(),
                       bookingModel.lastName(),
                       meal.getName(),

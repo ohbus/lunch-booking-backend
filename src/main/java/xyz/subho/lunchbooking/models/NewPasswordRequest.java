@@ -19,6 +19,9 @@
 package xyz.subho.lunchbooking.models;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 public record NewPasswordRequest(
-    @NotBlank(message = "Password field cannot be blank") String newPassword) {}
+    @NotBlank(message = "Password field cannot be blank")
+        @Size(min = 8, max = 32, message = "Password needs to me between 8 and 32 characters")
+        String newPassword) {}

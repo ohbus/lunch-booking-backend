@@ -77,7 +77,7 @@ public class OtpEntity implements Serializable {
   }
 
   public boolean isExpired() {
-    return LocalDateTime.now().isBefore(expiresAt);
+    return LocalDateTime.now().isAfter(expiresAt);
   }
 
   public void send() {

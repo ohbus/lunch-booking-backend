@@ -30,7 +30,7 @@ public final class EndpointPropertyKey {
   public static final String LOGIN_OTP_VALIDATE = "/login/otp/validate";
   public static final String LOGIN_OTP_RESEND = "/login/otp/resend";
 
-  public static final String FORGET_PASSWORD = "/login/forget/{username}";
+  public static final String FORGET_PASSWORD = "/login/forget";
   public static final String FORGET_PASSWORD_NEW_PASSWORD = "/login/forget/new";
 
   public static final String LOGIN_CHECK_USER_NAME = "/login/check/username/{username}";

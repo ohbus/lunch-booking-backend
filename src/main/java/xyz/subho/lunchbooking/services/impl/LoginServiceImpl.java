@@ -133,7 +133,8 @@ public class LoginServiceImpl implements LoginService, UserDetailsService {
 
   @Override
   @Transactional
-  public UserLoginResponseModel login(UserLoginRequestModel userRequest) {
+  public UserLoginResponseModel login(
+      UserLoginRequestModel userRequest, boolean bypassPasswordCheck) {
     if (StringUtils.isBlank(userRequest.getUsername())
         || StringUtils.isBlank(userRequest.getPassword())) {
       log.error("Username or Password cannot be blank");
@@ -145,8 +146,9 @@ public class LoginServiceImpl implements LoginService, UserDetailsService {
 
     checkUserAccountStatus(userLogin);
 
-    if (encryptionService.isPasswordValid(
-        userRequest.getPassword(), userLogin.getPassword(), userLogin.getSalt())) {
+    if (bypassPasswordCheck
+        || encryptionService.isPasswordValid(
+            userRequest.getPassword(), userLogin.getPassword(), userLogin.getSalt())) {
       log.debug("User:{} has validated their password", userLogin.getUsername());
 
       var userMetadata = getUserByEmail(userLogin.getUsername());
@@ -346,7 +348,7 @@ public class LoginServiceImpl implements LoginService, UserDetailsService {
 
     newOtp.issue();
     otpRepository.save(newOtp);
-    return new OtpModel(newOtp.getOtp());
+    return new OtpModel(newOtp.getId());
   }
 
   @Override
@@ -381,22 +383,35 @@ public class LoginServiceImpl implements LoginService, UserDetailsService {
     if (otpEntityOpt.isPresent()) {
 
       var otp = otpEntityOpt.get();
-      if (otp.getOtp().equals(requestModel.otp()) && !otp.isExpired()) {
+      if (otp.getOtp().equals(requestModel.otp())) {
 
-        otp.verify();
-        log.debug("OTP:{} has been verified for User ID:{}", requestModel.salt(), otp.getUserId());
+        if (otp.isVerified()) {
+          log.warn("OTP {} has been already verified!", requestModel);
+          throw new InvalidOtpConfiguration("OTP is already used!");
+        }
 
-        var user = getUserById(otp.getUserId());
-        user.setEnabled(true);
-        user.setSecured(true);
-        mailService.sendMail(
-            new Email(
-                user.getUsername(),
-                "Lunch Booking Account Activated",
-                "Hey!\n\nYour account is now READY to use.\n\nCheers!"));
+        if (!otp.isExpired()) {
 
-        return login(new UserLoginRequestModel(user.getUsername(), user.getPassword()));
+          otp.verify();
+          log.debug(
+              "OTP:{} has been verified for User ID:{}", requestModel.salt(), otp.getUserId());
+
+          var user = getUserById(otp.getUserId());
+          user.setEnabled(true);
+          user.setSecured(true);
+          mailService.sendMail(
+              new Email(
+                  user.getUsername(),
+                  "Lunch Booking Account Activated",
+                  "Hey!\n\nYour account is now READY to use.\n\nCheers!"));
+
+          return login(new UserLoginRequestModel(user.getUsername(), user.getPassword()), true);
+        }
+        log.error("OTP:{} has expired", requestModel);
+        throw new InvalidOtpConfiguration("OTP has expired!");
       }
+      log.error("OTP:{} did not match!", requestModel);
+      throw new InvalidOtpConfiguration("OTP did not match!");
     }
     log.error("OTP Invalid:{}", requestModel);
     throw new InvalidOtpConfiguration("Invalid OTP!");

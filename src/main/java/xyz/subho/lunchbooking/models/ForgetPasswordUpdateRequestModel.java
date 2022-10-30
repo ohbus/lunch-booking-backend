@@ -19,15 +19,6 @@
 package xyz.subho.lunchbooking.models;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
-public record UserChangePasswordRequestModel(
-    @NotBlank(message = "Current Password cannot be Blank")
-        @Size(
-            min = 8,
-            max = 32,
-            message = "Current Password needs to me between 8 and 32 characters")
-        String currentPassword,
-    @NotBlank(message = "Updated Password cannot be Blank")
-        @Size(min = 8, max = 32, message = "New Password needs to me between 8 and 32 characters")
-        String updatedPassword) {}
+public record ForgetPasswordUpdateRequestModel(
+    @NotBlank(message = "Username field cannot be blank") String username) {}

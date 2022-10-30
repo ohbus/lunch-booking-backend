@@ -53,7 +53,7 @@ public class Bookings extends BaseEntity implements Serializable {
   private Long cancelledAt;
 
   @ManyToOne(targetEntity = MealOptions.class, optional = false)
-  @JoinColumn(name = "meal_options_id")
+  @JoinColumn(name = "meal_options_id", updatable = false, nullable = false)
   private MealOptions mealOptions;
 
   public long availBooking() {

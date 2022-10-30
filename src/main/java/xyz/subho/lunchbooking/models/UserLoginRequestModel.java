@@ -21,6 +21,7 @@ package xyz.subho.lunchbooking.models;
 import java.io.Serializable;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -39,5 +40,6 @@ public class UserLoginRequestModel implements Serializable {
   private String username;
 
   @NotBlank(message = "Password cannot be blank")
+  @Size(min = 8, max = 32, message = "Password needs to me between 8 and 32 characters")
   private String password;
 }

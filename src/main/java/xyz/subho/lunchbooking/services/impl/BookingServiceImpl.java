@@ -67,7 +67,8 @@ public class BookingServiceImpl implements BookingService {
   @Override
   @Transactional
   public long createBooking(long mealOptionId, long userId) {
-    log.debug("Creating a New Booking for User ID: against Meal Option ID:", userId, mealOptionId);
+    log.debug(
+        "Creating a New Booking for User ID:{} against Meal Option ID:{}", userId, mealOptionId);
     var user = userService.getUserById(userId);
     var mealOption = mealsService.getMealOptionById(mealOptionId);
     var meal = mealOption.getMeals();
@@ -87,7 +88,7 @@ public class BookingServiceImpl implements BookingService {
           .getMealOptionsByBookingId(existingBooking.getId())
           .removeBooking(existingBooking);
     }
-    var booking = new Bookings().withUser(user).withDate(date);
+    var booking = new Bookings().withUser(user).withDate(date).withMealOptions(mealOption);
     log.debug("Creating Booking for UserID:{} and Meal Options ID:{}", userId, mealOptionId);
     booking = bookingRepository.save(booking);
     mealOption.addBooking(booking);

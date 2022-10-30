@@ -47,7 +47,7 @@ public class LoginController {
         "Applied login details id :{}, password :{}",
         userLoginDetails.getUsername(),
         userLoginDetails);
-    return loginService.login(userLoginDetails);
+    return loginService.login(userLoginDetails, false);
   }
 
   @PutMapping(EndpointPropertyKey.LOGIN_OTP_VALIDATE)
@@ -80,8 +80,9 @@ public class LoginController {
   }
 
   @PostMapping(EndpointPropertyKey.FORGET_PASSWORD)
-  public OtpModel forgetPasswordOtpRequest(@PathVariable String username) {
-    return loginService.createOtp(username);
+  public OtpModel forgetPasswordOtpRequest(
+      @RequestBody @Valid ForgetPasswordUpdateRequestModel passwordUpdateRequestModel) {
+    return loginService.createOtp(passwordUpdateRequestModel.username());
   }
 
   @PostMapping(EndpointPropertyKey.FORGET_PASSWORD_NEW_PASSWORD)

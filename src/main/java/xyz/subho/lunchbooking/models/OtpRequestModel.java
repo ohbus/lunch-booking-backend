@@ -24,7 +24,7 @@ import javax.validation.constraints.Min;
 
 public record OtpRequestModel(
     @Min(value = 1, message = "Salt Cannot be less than 1") long salt,
-    @Max(value = 6, message = "OTP cannot be more than 6 digits")
-        @Min(value = 6, message = "OTP cannot be less than 6 digits")
+    @Max(value = 999999, message = "OTP cannot be more than 6 digits")
+        @Min(value = 100000, message = "OTP cannot be less than 6 digits")
         Integer otp)
     implements Serializable {}

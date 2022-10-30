@@ -29,7 +29,8 @@ public interface LoginService {
 
   public void addUserRole(@NonNull UserLogin user, long roleId);
 
-  public UserLoginResponseModel login(@NonNull UserLoginRequestModel userRequest);
+  public UserLoginResponseModel login(
+      @NonNull UserLoginRequestModel userRequest, boolean bypassPasswordCheck);
 
   public UserLogin getUserByUsername(@NonNull String username);
 
