@@ -18,8 +18,4 @@
 
 package xyz.subho.lunchbooking.models;
 
-import javax.validation.constraints.NotBlank;
-
-public record UserChangePasswordRequestModel(
-    @NotBlank(message = "Current Password cannot be Blank") String currentPassword,
-    @NotBlank(message = "Updated Password cannot be Blank") String updatedPassword) {}
+public record ValidateOtpModel(boolean validity, long salt) {}

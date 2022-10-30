@@ -147,7 +147,7 @@ public class MealsServiceImpl implements MealsService {
 
   @Override
   public MealOptions getMealOptionsByBookingId(long id) {
-    var mealOptionOpt = mealOptionsRepository.findByBookingsMealOptions_Bookings_Id(id);
+    var mealOptionOpt = mealOptionsRepository.findByBookings_Id(id);
     if (mealOptionOpt.isEmpty()) {
       log.error("Cannot Find Meal Options with Booking ID:{}", id);
       throw new MealOptionsNotFoundException(
@@ -160,6 +160,7 @@ public class MealsServiceImpl implements MealsService {
   @Override
   @Transactional
   public MealsModel lockMeal(long mealId) {
+    log.debug("Trying to Lock Meal ID:{}", mealId);
     var meal = getMealById(mealId);
     if (meal.isLocked()) {
       log.error("Meal:{} is already Locked!", mealId);
@@ -177,6 +178,7 @@ public class MealsServiceImpl implements MealsService {
               meal.getName(), meal.getDate()));
     }
     meal.lock();
+    log.debug("Meal ID:{} is being Locked", mealId);
     return mealsRequestModelMapper.transform(meal);
   }
 
@@ -195,6 +197,7 @@ public class MealsServiceImpl implements MealsService {
   @Override
   @Transactional
   public MealsModel activateMeal(long mealId) {
+    log.debug("Trying to Activate Meal ID:{}", mealId);
     var meal = getMealById(mealId);
     if (meal.isActivated()) {
       log.error("Meal:{} is already Activated!", mealId);
@@ -202,12 +205,14 @@ public class MealsServiceImpl implements MealsService {
           String.format("Meal:%s is already Activated!", meal.getName()));
     }
     meal.activate();
+    log.debug("Meal ID:{} is being Activated", mealId);
     return mealsRequestModelMapper.transform(meal);
   }
 
   @Override
   @Transactional
   public MealsModel deactivateMeal(long mealId) {
+    log.debug("Trying to deactivate Meal ID:{}", mealId);
     var meal = getMealById(mealId);
     if (!meal.isActivated()) {
       log.error("Meal:{} is already Deactivated!", mealId);
@@ -215,12 +220,14 @@ public class MealsServiceImpl implements MealsService {
           String.format("Meal:%s is already Deactivated!", meal.getName()));
     }
     meal.deactivate();
+    log.debug("Meal ID:{} is being deactivated", mealId);
     return mealsRequestModelMapper.transform(meal);
   }
 
   @Override
   @Transactional
   public MealsModel makeMealReady(long mealId) {
+    log.debug("Marking Meal ID:{} as Ready", mealId);
     var meal = getMealById(mealId);
     if (meal.isReady()) {
       log.error("Meal:{} is already Ready!", mealId);
@@ -238,7 +245,9 @@ public class MealsServiceImpl implements MealsService {
               meal.getName(), meal.getDate()));
     }
     meal.markReady();
+    log.debug("Sending Email Information to People Booking");
     sendReadyEmails(meal);
+    log.debug("Meal ID:{} is now Ready", mealId);
     return mealsRequestModelMapper.transform(meal);
   }
 
@@ -246,13 +255,14 @@ public class MealsServiceImpl implements MealsService {
   protected void sendReadyEmails(Meals meal) {
 
     var bookingList = bookingRepository.findByDateAndCancelledAtNull(meal.getDate());
-
+    log.debug("Sending QR Booking Information to {} users", bookingList.size());
     bookingList.forEach(
         booking -> {
           var user = booking.getUser();
           var bookingModel = bookingResponseModelMapper.transform(booking);
           var bookingId = Long.toString(booking.getId());
 
+          log.debug("Sending QR Booking Information to:{}", user.getEmailId());
           mailService.sendMail(
               new Email(
                   user.getEmailId(),

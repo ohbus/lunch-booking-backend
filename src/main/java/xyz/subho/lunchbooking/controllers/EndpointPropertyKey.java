@@ -27,6 +27,17 @@ public final class EndpointPropertyKey {
   public static final String LOGIN_USER_REGISTRATION = "/login/register";
   public static final String LOGIN_USER = "/login";
 
+  public static final String LOGIN_OTP_VALIDATE = "/login/otp/validate";
+  public static final String LOGIN_OTP_RESEND = "/login/otp/resend";
+
+  public static final String FORGET_PASSWORD = "/login/forget/{username}";
+  public static final String FORGET_PASSWORD_NEW_PASSWORD = "/login/forget/new";
+
+  public static final String LOGIN_CHECK_USER_NAME = "/login/check/username/{username}";
+  public static final String LOGIN_CHECK_PHONE_NUMBER = "/login/check/phone/{phone}";
+
+  public static final String LOGIN_CHANGE_PASSWORD = "/login/passwd";
+
   public static final String MEAL_CREATE = "/meal/create";
   public static final String MEAL_ACTIVATE = "/meal/activate/{mealId}";
   public static final String MEAL_LOCK = "/meal/lock/{mealId}";

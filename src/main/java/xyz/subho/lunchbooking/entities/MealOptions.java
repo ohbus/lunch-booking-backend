@@ -19,6 +19,7 @@
 package xyz.subho.lunchbooking.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -40,7 +41,7 @@ import lombok.*;
 @With
 public class MealOptions extends BaseEntity implements Serializable {
 
-  private static final long serialVersionUID = -6473537837965565355L;
+  @Serial private static final long serialVersionUID = -6473537837965565355L;
 
   @Column(length = 30, nullable = false)
   private String name;
@@ -52,11 +53,16 @@ public class MealOptions extends BaseEntity implements Serializable {
 
   @OneToMany(mappedBy = "mealOptions", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JsonIgnore
-  private Set<BookingsMealOptions> bookingsMealOptions = new HashSet<>();
+  private Set<Bookings> bookings = new HashSet<>();
 
   @OneToMany(mappedBy = "mealOptions", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JsonIgnore
   private Set<AvailableBookings> availableBookings = new HashSet<>();
+
+  public MealOptions(long id, String name) {
+    this(name);
+    this.setId(id);
+  }
 
   public MealOptions(String name) {
     this.name = name;
@@ -67,10 +73,15 @@ public class MealOptions extends BaseEntity implements Serializable {
     if (Objects.nonNull(bookings))
       bookings.forEach(
           booking -> {
-            var mapping = new BookingsMealOptions(booking, this);
-            this.bookingsMealOptions.add(mapping);
+            this.bookings.add(booking);
             incrementCount();
           });
+  }
+
+  public void addAvailableBooking(AvailableBookings availableBookings) {
+    if (Objects.nonNull(availableBookings)) {
+      this.availableBookings.add(availableBookings);
+    }
   }
 
   private void incrementCount() {
@@ -87,11 +98,11 @@ public class MealOptions extends BaseEntity implements Serializable {
   }
 
   public void removeBookingById(long bookingId) {
-    Set<BookingsMealOptions> toBeDeleted =
-        bookingsMealOptions.stream()
-            .filter(mapping -> mapping.getId().getBookingId().equals(bookingId))
+    Set<Bookings> toBeDeleted =
+        bookings.stream()
+            .filter(booking -> booking.getId().equals(bookingId))
             .collect(Collectors.toSet());
-    bookingsMealOptions.removeAll(toBeDeleted);
+    bookings.removeAll(toBeDeleted);
     count -= toBeDeleted.size();
   }
 

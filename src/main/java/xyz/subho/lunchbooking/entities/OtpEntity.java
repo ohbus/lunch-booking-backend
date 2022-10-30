@@ -51,6 +51,8 @@ public class OtpEntity implements Serializable {
 
   LocalDateTime verifiedAt;
 
+  LocalDateTime resentAt;
+
   @Column(nullable = false, updatable = false)
   LocalDateTime expiresAt;
 
@@ -70,6 +72,10 @@ public class OtpEntity implements Serializable {
     return Objects.nonNull(verifiedAt);
   }
 
+  public boolean isResent() {
+    return Objects.nonNull(resentAt);
+  }
+
   public boolean isExpired() {
     return LocalDateTime.now().isBefore(expiresAt);
   }
@@ -84,5 +90,9 @@ public class OtpEntity implements Serializable {
 
   public void verify() {
     verifiedAt = LocalDateTime.now();
+  }
+
+  public void resend() {
+    resentAt = LocalDateTime.now();
   }
 }

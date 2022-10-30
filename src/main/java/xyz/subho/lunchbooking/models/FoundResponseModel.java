@@ -16,23 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package xyz.subho.lunchbooking.entities;
+package xyz.subho.lunchbooking.models;
 
 import java.io.Serializable;
-import javax.persistence.Embeddable;
-import lombok.*;
 
-@Embeddable
-@Setter
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
-@With
-public class BookingsMealOptionsId implements Serializable {
-
-  private static final long serialVersionUID = -1180526388055863804L;
-
-  private Long bookingId;
-
-  private Long mealOptionsId;
-}
+public record FoundResponseModel(boolean found) implements Serializable {}

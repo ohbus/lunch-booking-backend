@@ -23,6 +23,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.activation.DataSource;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,11 +36,18 @@ import lombok.With;
 @AllArgsConstructor
 public class Email {
 
+  @Size(min = 1, message = "There should be atleast 1 email recipient")
   private Set<String> recipients = new HashSet<>(4);
+
   private Set<String> ccList = new HashSet<>(4);
   private Set<String> bccList = new HashSet<>(4);
+
+  @NotBlank(message = "Email Subject cannot be Empty")
   private String subject;
+
+  @NotBlank(message = "Email Body cannot be Empty")
   private String body;
+
   private boolean isHtml = false;
   private Map<String, DataSource> attachments = new HashMap<>(4);
 

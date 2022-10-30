@@ -67,7 +67,7 @@ public class BookingServiceImpl implements BookingService {
   @Override
   @Transactional
   public long createBooking(long mealOptionId, long userId) {
-
+    log.debug("Creating a New Booking for User ID: against Meal Option ID:", userId, mealOptionId);
     var user = userService.getUserById(userId);
     var mealOption = mealsService.getMealOptionById(mealOptionId);
     var meal = mealOption.getMeals();
@@ -91,10 +91,12 @@ public class BookingServiceImpl implements BookingService {
     log.debug("Creating Booking for UserID:{} and Meal Options ID:{}", userId, mealOptionId);
     booking = bookingRepository.save(booking);
     mealOption.addBooking(booking);
+    log.debug("Booking ID:{} Created", booking.getId());
     return booking.getId();
   }
 
   private void checkMealValidity(Meals meal) {
+    log.debug("Checking Meal ID:{} for Validity", meal.getId());
     if (meal.isLocked()) {
       log.error("Booking cannot be created as Meal ID:{} is already Locked", meal.getId());
       throw new SelectionLockedException(
@@ -105,11 +107,13 @@ public class BookingServiceImpl implements BookingService {
       throw new SelectionNotAvailableException(
           String.format("Selection:%s is NOT Available for Booking.", meal.getName()));
     }
+    log.debug("Meal ID:{} is VALID", meal.getId());
   }
 
   @Override
   @Transactional
   public long cancelBookingById(long id, long userId) {
+    log.debug("Trying to Cancel Booking ID:{} by User ID:{}", id, userId);
     var booking = getBookingById(id);
     var user = userService.getUserById(userId);
     if (Objects.nonNull(booking.getCancelledAt())) {
@@ -130,26 +134,37 @@ public class BookingServiceImpl implements BookingService {
       // Available Meal Bookings for a particular day is created for broadcast
       createAvailableMealForToday(mealOption);
     }
+    log.debug("Booking ID:{} is being CANCELLED", id);
     return booking.cancelBooking();
   }
 
   @Transactional
   protected void createAvailableMealForToday(MealOptions mealOptions) {
+    log.debug("Meal Option:{} is being made available for Booking", mealOptions.getId());
     var date = mealOptions.getMeals().getDate();
     var availableBookingOpt =
         availableBookingsRepository.findByDateAndMealOptions_Id(date, mealOptions.getId());
     if (availableBookingOpt.isPresent()) {
+      log.debug(
+          "Available Meal Option is already present, thus adding one more to Avail ID:{}",
+          availableBookingOpt.get().getId());
       // Adds another Meal which got cancelled
       availableBookingOpt.get().add();
     } else {
       // If there is no available meal option, then creates one
-      availableBookingsRepository.save(new AvailableBookings(date, mealOptions));
+      var id = availableBookingsRepository.save(new AvailableBookings(date, mealOptions)).getId();
+      log.debug(
+          "No new meal options were present for Meal Option:{} Created NEW Avail ID:{}",
+          mealOptions.getId(),
+          id);
     }
+    log.debug("One more meal has been made available for Meal Option ID:{}", mealOptions.getId());
   }
 
   @Override
   @Transactional
   public long claimAvailableMeal(long mealOptionId, long userId) {
+    log.debug("Trying to claim available Meal Option ID:{} for User ID:{}", mealOptionId, userId);
     var today = LocalDate.now();
     // Checks if there is an existing booking for today
     if (bookingRepository.existsByDateAndUser_IdAndCancelledAtNull(today, userId)) {
@@ -163,6 +178,7 @@ public class BookingServiceImpl implements BookingService {
     if (availableBookingOpt.isPresent()) {
       var availableBooking = availableBookingOpt.get();
       if (availableBooking.isAvailable()) {
+        log.debug("Meal Option:{} is available for booking by User ID:{}", mealOptionId, userId);
         var mealOption = mealsService.getMealOptionById(mealOptionId);
         var mealOptionDay = mealOption.getMeals().getDate();
         if (!today.isEqual(mealOptionDay)) {
@@ -175,14 +191,14 @@ public class BookingServiceImpl implements BookingService {
         }
         var user = userService.getUserById(userId);
         var booking = new Bookings().withUser(user).withDate(mealOptionDay);
+        availableBooking.claim();
+        mealOption.addBooking(booking);
         bookingRepository.save(booking);
         log.debug(
             "Created New Booking with ID:{} for User ID:{} with Meal Option ID:{}",
             booking.getId(),
             userId,
             mealOptionId);
-        availableBooking.claim();
-        mealOption.addBooking(booking);
         return booking.getId();
       } else {
         log.error(
@@ -214,6 +230,7 @@ public class BookingServiceImpl implements BookingService {
     log.debug("Booking ID:{} is being deleted", id);
     var bookingToBeDeleted = getBookingById(id);
     bookingRepository.delete(bookingToBeDeleted);
+    log.debug("Booking ID:{} has been deleted", id);
   }
 
   @Override
@@ -241,14 +258,13 @@ public class BookingServiceImpl implements BookingService {
   @Override
   @Transactional
   public BookingResponseModel availBooking(long id) {
+    log.debug("Trying to avail Booking ID:{}", id);
     var booking = getBookingById(id);
     if (Objects.nonNull(booking.getClaimedAt())) {
       log.error("Booking ID:{} is already claimed!", id);
       throw new InvalidBookingOperation(String.format("Booking ID:%s is already claimed!", id));
     }
-    var mealOpt =
-        mealsRepository.findByDateAndMealOptions_BookingsMealOptions_Bookings(
-            booking.getDate(), booking);
+    var mealOpt = mealsRepository.findByMealOptions_Bookings_Id(booking.getId());
     if (mealOpt.isPresent()) {
       var meal = mealOpt.get();
       if (!meal.isReady()) {
@@ -266,6 +282,7 @@ public class BookingServiceImpl implements BookingService {
       throw new InvalidBookingOperation("Meal is not present for this Booking");
     }
     booking.availBooking();
+    log.debug("Booking ID:{} is being availed", id);
     return bookingResponseModelMapper.transform(booking);
   }
 
@@ -321,11 +338,13 @@ public class BookingServiceImpl implements BookingService {
   }
 
   private void checkIfBookingOwnedByUser(Bookings booking, UserMetadata user) {
+    log.debug("Checking if Booking ID:{} is owned by User ID:{}", booking.getId(), user.getId());
     if (!booking.getUser().equals(user)) {
       log.error("Booking ID:{} does not belong to User ID:{}", booking.getId(), user.getId());
       throw new InvalidBookingOperation(
           String.format(
               "Booking ID:%s does not belong to User ID:%s", booking.getId(), user.getId()));
     }
+    log.debug("Booking ID:{} is owned by User ID:{}", booking.getId(), user.getId());
   }
 }

@@ -19,5 +19,7 @@
 package xyz.subho.lunchbooking.models;
 
 import java.io.Serializable;
+import javax.validation.constraints.Min;
 
-public record OtpResponseModel(long salt) implements Serializable {}
+public record OtpModel(@Min(value = 1, message = "OTP Salt cannot be less than 1") long salt)
+    implements Serializable {}

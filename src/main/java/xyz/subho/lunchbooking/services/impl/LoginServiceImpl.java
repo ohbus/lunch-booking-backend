@@ -19,39 +19,46 @@
 package xyz.subho.lunchbooking.services.impl;
 
 import io.micrometer.core.instrument.util.StringUtils;
+import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.NonNull;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import xyz.subho.lunchbooking.entities.OtpEntity;
 import xyz.subho.lunchbooking.entities.Roles;
 import xyz.subho.lunchbooking.entities.UserLogin;
 import xyz.subho.lunchbooking.entities.UserMetadata;
-import xyz.subho.lunchbooking.exceptions.InvalidLoginException;
-import xyz.subho.lunchbooking.exceptions.InvalidUsernameException;
-import xyz.subho.lunchbooking.exceptions.RoleNotFoundException;
-import xyz.subho.lunchbooking.exceptions.UserNotFoundException;
+import xyz.subho.lunchbooking.exceptions.*;
 import xyz.subho.lunchbooking.mapper.Mapper;
-import xyz.subho.lunchbooking.models.UserChangePasswordRequestModel;
-import xyz.subho.lunchbooking.models.UserLoginRequestModel;
-import xyz.subho.lunchbooking.models.UserLoginResponseModel;
-import xyz.subho.lunchbooking.models.UserRegistrationModel;
-import xyz.subho.lunchbooking.models.UserResponseModel;
+import xyz.subho.lunchbooking.models.*;
+import xyz.subho.lunchbooking.repositories.OtpRepository;
 import xyz.subho.lunchbooking.repositories.RolesRepository;
 import xyz.subho.lunchbooking.repositories.UserLoginRepository;
 import xyz.subho.lunchbooking.repositories.UserMetadataRepository;
 import xyz.subho.lunchbooking.security.JwtHelper;
-import xyz.subho.lunchbooking.services.EncryptionService;
-import xyz.subho.lunchbooking.services.LoginService;
+import xyz.subho.lunchbooking.services.*;
 
 @Service
 @Slf4j
 public class LoginServiceImpl implements LoginService, UserDetailsService {
+
+  @Value("${otp.validity.mins:2}")
+  private String expiryInMinutes;
+
+  @Autowired private MailService mailService;
+
+  @Autowired private UserService userService;
+
+  @Autowired private OtpRepository otpRepository;
 
   @Autowired private UserLoginRepository loginRepository;
 
@@ -68,11 +75,14 @@ public class LoginServiceImpl implements LoginService, UserDetailsService {
   @Value("${app.security.jwt.salt.length}")
   private String saltSize;
 
+  @Value("${generated.password.size}:16")
+  private String generatedPasswordSize;
+
   @Autowired private JwtHelper jwtHelper;
 
   @Override
   @Transactional
-  public void createUser(UserRegistrationModel user) {
+  public OtpModel createUser(UserRegistrationModel user) {
 
     log.debug("Starting User Registration for:{}", user.getEmailId());
     checkIfUserExists(user.getEmailId(), user.getMobile());
@@ -101,6 +111,7 @@ public class LoginServiceImpl implements LoginService, UserDetailsService {
 
     userLogin = loginRepository.save(userLogin);
     log.debug("Created Login Details for User ID:{}", userLogin.getId());
+    return createOtp(userLogin.getId(), userLogin.getUsername());
   }
 
   private void checkIfUserExists(String username, String mobile) {
@@ -130,13 +141,13 @@ public class LoginServiceImpl implements LoginService, UserDetailsService {
     }
 
     var userLogin = getUserByUsername(userRequest.getUsername());
-    log.info("Login Request Recieved from:{}", userLogin.getUsername());
+    log.info("Login Request Received from:{}", userLogin.getUsername());
 
     checkUserAccountStatus(userLogin);
 
     if (encryptionService.isPasswordValid(
         userRequest.getPassword(), userLogin.getPassword(), userLogin.getSalt())) {
-      log.debug("User:{} has validated thier password", userLogin.getUsername());
+      log.debug("User:{} has validated their password", userLogin.getUsername());
 
       var userMetadata = getUserByEmail(userLogin.getUsername());
       log.debug("Fetched User Details for email:{}", userMetadata.getEmailId());
@@ -207,7 +218,25 @@ public class LoginServiceImpl implements LoginService, UserDetailsService {
     return user;
   }
 
-  private UserLogin getUserById(long userId) {
+  @Override
+  public boolean checkUserNameExists(String username) {
+    if (StringUtils.isBlank(username)) {
+      log.warn("Username is being being checked against blank data.");
+      return false;
+    }
+    return loginRepository.existsByUsername(username);
+  }
+
+  @Override
+  public boolean checkPhoneExists(String phone) {
+    if (StringUtils.isBlank(phone)) {
+      log.warn("Phone number is being being checked against blank data.");
+      return false;
+    }
+    return metadataRepository.existsByMobileIgnoreCase(phone);
+  }
+
+  public UserLogin getUserById(long userId) {
 
     log.debug("Finding user with ID:{}", userId);
     var userLoginOpt = loginRepository.findById(userId);
@@ -270,9 +299,107 @@ public class LoginServiceImpl implements LoginService, UserDetailsService {
   }
 
   @Override
-  public void UserChangePassword(UserChangePasswordRequestModel changePasswordRequest) {
-    // TODO Auto-generated method stub
+  @Transactional
+  public void userChangePassword(
+      @NonNull @Valid UserChangePasswordRequestModel changePasswordRequest, long userId) {
+    log.debug("Changing Password for User ID:{}", userId);
+    var user = getUserById(userId);
+    if (encryptionService.isPasswordValid(
+        changePasswordRequest.currentPassword(), user.getPassword(), user.getSalt())) {
 
+      final String salt = encryptionService.generateSalt(Integer.parseInt(saltSize));
+      user.setPassword(encryptionService.encrypt(changePasswordRequest.updatedPassword(), salt));
+      user.setSalt(salt);
+      log.debug("Changed Password for User ID:{}", userId);
+    } else {
+      log.error("Password Change FAILED for User ID:{}. Mismatched Password!", userId);
+      throw new InvalidLoginException("Passwords did NOT match!");
+    }
+  }
+
+  @Override
+  @Transactional
+  public void forgetPassword(@NonNull String newPassword, long userId) {
+    log.debug("Changing Password for User ID:{}", userId);
+    var user = getUserById(userId);
+    final String salt = encryptionService.generateSalt(Integer.parseInt(saltSize));
+    user.setPassword(encryptionService.encrypt(newPassword, salt));
+    user.setSalt(salt);
+    log.debug("Password has been updated for User ID:{}", userId);
+  }
+
+  @Override
+  @Transactional
+  public OtpModel createOtp(long userId, String email) {
+    var newOtp = new OtpEntity(userId);
+    newOtp.setExpiresAt(LocalDateTime.now().plusMinutes(Long.parseLong(expiryInMinutes)));
+
+    var otp = new SecureRandom().nextInt(100000, 999999);
+    newOtp.setOtp(otp);
+
+    mailService.sendMail(
+        new Email(
+            email,
+            String.format("Your OTP is %s", otp),
+            String.format("Hello!%n%nYour OTP for Lunch Application is: %s%n%nCheers!", otp)));
+    newOtp.send();
+
+    newOtp.issue();
+    otpRepository.save(newOtp);
+    return new OtpModel(newOtp.getOtp());
+  }
+
+  @Override
+  @Transactional
+  public OtpModel createOtp(String username) {
+    var user = getUserByUsername(username);
+    return createOtp(user.getId(), username);
+  }
+
+  @Override
+  @Transactional
+  public OtpModel resendOtp(long salt) {
+    var otpOpt = otpRepository.findById(salt);
+    if (otpOpt.isPresent()) {
+
+      var otp = otpOpt.get();
+      var user = userService.getUserById(otp.getUserId());
+
+      otp.resend();
+
+      return createOtp(otp.getUserId(), user.getEmailId());
+    } else {
+      log.error("Wrong ID sent for previous Otp:{}", salt);
+      throw new InvalidOtpConfiguration("Please try after sometime.");
+    }
+  }
+
+  @Override
+  @Transactional
+  public UserLoginResponseModel validateOtp(@lombok.NonNull @Valid OtpRequestModel requestModel) {
+    var otpEntityOpt = otpRepository.findById(requestModel.salt());
+    if (otpEntityOpt.isPresent()) {
+
+      var otp = otpEntityOpt.get();
+      if (otp.getOtp().equals(requestModel.otp()) && !otp.isExpired()) {
+
+        otp.verify();
+        log.debug("OTP:{} has been verified for User ID:{}", requestModel.salt(), otp.getUserId());
+
+        var user = getUserById(otp.getUserId());
+        user.setEnabled(true);
+        user.setSecured(true);
+        mailService.sendMail(
+            new Email(
+                user.getUsername(),
+                "Lunch Booking Account Activated",
+                "Hey!\n\nYour account is now READY to use.\n\nCheers!"));
+
+        return login(new UserLoginRequestModel(user.getUsername(), user.getPassword()));
+      }
+    }
+    log.error("OTP Invalid:{}", requestModel);
+    throw new InvalidOtpConfiguration("Invalid OTP!");
   }
 
   @Override

@@ -25,5 +25,5 @@ import xyz.subho.lunchbooking.entities.MealOptions;
 
 public interface MealOptionsRepository extends JpaRepository<MealOptions, Long> {
 
-  Optional<MealOptions> findByBookingsMealOptions_Bookings_Id(@NonNull Long id);
+  Optional<MealOptions> findByBookings_Id(@NonNull Long id);
 }

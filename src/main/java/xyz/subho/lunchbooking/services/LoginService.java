@@ -18,28 +18,43 @@
 
 package xyz.subho.lunchbooking.services;
 
+import org.springframework.lang.NonNull;
 import xyz.subho.lunchbooking.entities.UserLogin;
 import xyz.subho.lunchbooking.entities.UserMetadata;
-import xyz.subho.lunchbooking.models.UserChangePasswordRequestModel;
-import xyz.subho.lunchbooking.models.UserLoginRequestModel;
-import xyz.subho.lunchbooking.models.UserLoginResponseModel;
-import xyz.subho.lunchbooking.models.UserRegistrationModel;
+import xyz.subho.lunchbooking.models.*;
 
 public interface LoginService {
 
-  public void createUser(UserRegistrationModel user);
+  public OtpModel createUser(@NonNull UserRegistrationModel user);
 
-  public void addUserRole(UserLogin user, long roleId);
+  public void addUserRole(@NonNull UserLogin user, long roleId);
 
-  public UserLoginResponseModel login(UserLoginRequestModel userRequest);
+  public UserLoginResponseModel login(@NonNull UserLoginRequestModel userRequest);
 
-  public UserLogin getUserByUsername(String username);
+  public UserLogin getUserByUsername(@NonNull String username);
 
-  public UserMetadata getUserByEmail(String email);
+  public UserMetadata getUserByEmail(@NonNull String email);
+
+  public UserLogin getUserById(long userId);
 
   public UserLogin addRole(long userId, long roleId);
 
   public UserLogin removeRole(long userId, long roleId);
 
-  public void UserChangePassword(UserChangePasswordRequestModel changePasswordRequest);
+  public boolean checkUserNameExists(String username);
+
+  public void forgetPassword(@NonNull String newPassword, long userId);
+
+  public boolean checkPhoneExists(String phone);
+
+  public void userChangePassword(
+      @NonNull UserChangePasswordRequestModel changePasswordRequest, long userId);
+
+  public OtpModel createOtp(long userId, String email);
+
+  public OtpModel createOtp(String username);
+
+  public OtpModel resendOtp(long salt);
+
+  public UserLoginResponseModel validateOtp(OtpRequestModel requestModel);
 }

@@ -18,9 +18,9 @@
 
 package xyz.subho.lunchbooking.mapper;
 
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 import xyz.subho.lunchbooking.entities.Bookings;
+import xyz.subho.lunchbooking.entities.MealOptions;
 import xyz.subho.lunchbooking.entities.UserMetadata;
 import xyz.subho.lunchbooking.models.BookingResponseModel;
 
@@ -29,22 +29,14 @@ public class BookingResponseMapper implements Mapper<Bookings, BookingResponseMo
 
   @Override
   public BookingResponseModel transform(Bookings source) {
-    Pair<Long, String> mealOptionIdNamePair =
-        source.getBookingsMealOptions().stream()
-            .map(
-                bookingsMealOptions ->
-                    Pair.of(
-                        bookingsMealOptions.getMealOptions().getId(),
-                        bookingsMealOptions.getMealOptions().getName()))
-            .findFirst()
-            .orElseGet(() -> Pair.of(0L, ""));
+    var mealOpt = source.getMealOptions();
     return new BookingResponseModel(
         source.getId(),
         source.getUser().getFirstName(),
         source.getUser().getLastName(),
         source.getDate(),
-        mealOptionIdNamePair.getSecond(),
-        mealOptionIdNamePair.getFirst(),
+        mealOpt.getName(),
+        mealOpt.getId(),
         source.getClaimedAt());
   }
 
@@ -55,6 +47,8 @@ public class BookingResponseMapper implements Mapper<Bookings, BookingResponseMo
     booking.setUser(
         new UserMetadata().withFirstName(source.firstName()).withLastName(source.lastName()));
     booking.setClaimedAt(source.availedAt());
-    return booking.withDate(source.date());
+    return booking
+        .withDate(source.date())
+        .withMealOptions(new MealOptions(source.mealOptionId(), source.mealOption()));
   }
 }

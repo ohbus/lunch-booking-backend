@@ -26,6 +26,7 @@ import javax.validation.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -50,7 +51,9 @@ public class GlobalExceptionHandlerController {
     UserIsSecuredException.class,
     PermissionNotFoundException.class,
     MealNotFoundException.class,
-    BookingNotFoundException.class
+    BookingNotFoundException.class,
+    InvalidOtpConfiguration.class,
+    UsernameNotFoundException.class
   })
   public ResponseEntity<ErrorDetails> handleAsNotFound(RuntimeException ex) {
 

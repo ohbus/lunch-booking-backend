@@ -18,19 +18,14 @@
 
 package xyz.subho.lunchbooking.controllers;
 
+import java.security.Principal;
 import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-import xyz.subho.lunchbooking.models.UserLoginRequestModel;
-import xyz.subho.lunchbooking.models.UserLoginResponseModel;
-import xyz.subho.lunchbooking.models.UserRegistrationModel;
+import org.springframework.web.bind.annotation.*;
+import xyz.subho.lunchbooking.models.*;
 import xyz.subho.lunchbooking.services.LoginService;
-import xyz.subho.lunchbooking.services.MailService;
 
 @RestController
 @Slf4j
@@ -38,14 +33,11 @@ public class LoginController {
 
   @Autowired private LoginService loginService;
 
-  @Autowired private MailService mailService;
-
   @PostMapping(EndpointPropertyKey.LOGIN_USER_REGISTRATION)
   @ResponseStatus(code = HttpStatus.CREATED)
-  public void registerUser(@RequestBody @Valid UserRegistrationModel user) {
-    log.debug("Initializing User Regisration for:{}", user.getEmailId());
-    loginService.createUser(user);
-    log.debug("Completed User Registration for:{}", user.getEmailId());
+  public OtpModel registerUser(@RequestBody @Valid UserRegistrationModel user) {
+    log.debug("Initializing User Registration for:{}", user.getEmailId());
+    return loginService.createUser(user);
   }
 
   @PostMapping(EndpointPropertyKey.LOGIN_USER)
@@ -58,5 +50,44 @@ public class LoginController {
     return loginService.login(userLoginDetails);
   }
 
-  public void userChangePassword() {}
+  @PutMapping(EndpointPropertyKey.LOGIN_OTP_VALIDATE)
+  public UserLoginResponseModel validateOtp(@RequestBody @Valid OtpRequestModel otpRequestModel) {
+    return loginService.validateOtp(otpRequestModel);
+  }
+
+  @PostMapping(EndpointPropertyKey.LOGIN_OTP_RESEND)
+  public OtpModel resendOtp(@RequestBody @Valid OtpModel otpRequestModel) {
+    return loginService.resendOtp(otpRequestModel.salt());
+  }
+
+  @PostMapping(EndpointPropertyKey.LOGIN_CHECK_USER_NAME)
+  public FoundResponseModel checkUsernameExist(@PathVariable String username) {
+    return new FoundResponseModel(loginService.checkUserNameExists(username));
+  }
+
+  @PostMapping(EndpointPropertyKey.LOGIN_CHECK_PHONE_NUMBER)
+  public FoundResponseModel checkPhoneExist(@PathVariable String phone) {
+    return new FoundResponseModel(loginService.checkPhoneExists(phone));
+  }
+
+  @PostMapping(EndpointPropertyKey.LOGIN_CHANGE_PASSWORD)
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void userChangePassword(
+      @RequestBody @Valid UserChangePasswordRequestModel changePasswordRequestModel,
+      Principal principal) {
+    loginService.userChangePassword(
+        changePasswordRequestModel, Long.parseLong(principal.getName()));
+  }
+
+  @PostMapping(EndpointPropertyKey.FORGET_PASSWORD)
+  public OtpModel forgetPasswordOtpRequest(@PathVariable String username) {
+    return loginService.createOtp(username);
+  }
+
+  @PostMapping(EndpointPropertyKey.FORGET_PASSWORD_NEW_PASSWORD)
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void registerNewPassword(
+      @RequestBody @Valid NewPasswordRequest passwordRequest, Principal principal) {
+    loginService.forgetPassword(passwordRequest.newPassword(), Long.parseLong(principal.getName()));
+  }
 }

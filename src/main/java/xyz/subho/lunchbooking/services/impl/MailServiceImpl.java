@@ -22,6 +22,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,7 +55,7 @@ public class MailServiceImpl implements MailService {
   private String replyToName;
 
   @Override
-  public void sendMail(@NonNull Email email) {
+  public void sendMail(@NonNull @Valid Email email) {
 
     MimeMessage message = mailSender.createMimeMessage();
 
@@ -94,6 +95,4 @@ public class MailServiceImpl implements MailService {
       log.error("Could not send email due to {}", e.getMessage());
     }
   }
-
-  private void validateEmail(@NonNull Email email) {}
 }

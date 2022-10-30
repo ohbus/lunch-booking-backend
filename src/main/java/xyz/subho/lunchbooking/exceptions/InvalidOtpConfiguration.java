@@ -16,16 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package xyz.subho.lunchbooking.services;
+package xyz.subho.lunchbooking.exceptions;
 
-import xyz.subho.lunchbooking.models.OtpRequestModel;
-import xyz.subho.lunchbooking.models.OtpResponseModel;
+public class InvalidOtpConfiguration extends RuntimeException {
 
-public interface OtpService {
-
-  public OtpResponseModel createOtp(long userId);
-
-  public OtpResponseModel resendOtp(long salt);
-
-  public boolean validateOtp(OtpRequestModel requestModel);
+  public InvalidOtpConfiguration(String message) {
+    super(message);
+  }
 }
