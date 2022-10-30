@@ -74,7 +74,7 @@ public class JwtHelper {
     return jwtBuilder
         .withIssuedAt(new Date())
         .withExpiresAt(makeValidity())
-        .sign(Algorithm.RSA512(publicKey, privateKey));
+        .sign(Algorithm.RSA256(publicKey, privateKey));
   }
 
   public boolean validateToken(String token, UserLogin user) {
