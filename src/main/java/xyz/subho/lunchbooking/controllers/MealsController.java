@@ -20,6 +20,7 @@ package xyz.subho.lunchbooking.controllers;
 
 import java.security.Principal;
 import java.util.List;
+import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,7 @@ public class MealsController {
 
   @PostMapping(EndpointPropertyKey.MEAL_CREATE)
   @ResponseStatus(HttpStatus.CREATED)
+  @RolesAllowed(Roles.ROLE_MANAGER)
   public MealsModel addMeal(@RequestBody @Valid MealsModel mealsModel, Principal principal) {
     return mealsService.createMeal(mealsModel);
   }

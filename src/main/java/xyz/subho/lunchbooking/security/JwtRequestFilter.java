@@ -33,7 +33,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import xyz.subho.lunchbooking.services.LoginService;
 
 @Component
 @Slf4j
@@ -43,8 +42,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
   private static final String AUTHORIZATION_BEARER = "Bearer ";
 
   @Autowired private JwtHelper jwtHelper;
-
-  @Autowired private LoginService loginService;
 
   @Override
   protected void doFilterInternal(
@@ -63,7 +60,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         username = jwtHelper.extractUsername(jwtToken);
       } catch (IllegalArgumentException e) {
         log.error("Unable to get JWT Token");
-      } catch (JWTDecodeException e) {
+      } catch (JWTDecodeException | NullPointerException e) {
         log.error("JWT Decode Error");
       }
     } else {
@@ -73,13 +70,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     if (StringUtils.isNotBlank(username)
         && Objects.isNull(SecurityContextHolder.getContext().getAuthentication())) {
 
-      var currentUserDetails = loginService.getUserByUsername(username);
+      if (jwtHelper.validateToken(jwtToken)) {
 
-      if (jwtHelper.validateToken(jwtToken, currentUserDetails)) {
+        var authDetails = jwtHelper.getAuthenticatedUserDetails(jwtToken);
 
         var authToken =
             new UsernamePasswordAuthenticationToken(
-                currentUserDetails.getId(), null, currentUserDetails.getAuthorities());
+                authDetails.getFirst(), null, authDetails.getSecond());
 
         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 

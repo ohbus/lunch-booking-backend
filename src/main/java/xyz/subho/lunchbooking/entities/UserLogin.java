@@ -23,12 +23,14 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.persistence.*;
 import lombok.*;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.NaturalIdCache;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
@@ -95,9 +97,9 @@ public class UserLogin extends BaseEntity implements UserDetails, Serializable {
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    Set<Permissions> permission = new HashSet<>();
-    roles.forEach(role -> permission.addAll(role.getPermissions()));
-    return permission;
+    return roles.stream()
+        .map(role -> new SimpleGrantedAuthority(role.getRole()))
+        .collect(Collectors.toSet());
   }
 
   @Override

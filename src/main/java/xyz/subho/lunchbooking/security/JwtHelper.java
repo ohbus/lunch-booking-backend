@@ -20,21 +20,29 @@ package xyz.subho.lunchbooking.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.util.Pair;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import xyz.subho.lunchbooking.entities.Roles;
 import xyz.subho.lunchbooking.entities.UserLogin;
 
+@Slf4j
 @Component
 public class JwtHelper {
+
+  public static final String JWT_ISSUER = "lunch-booking";
 
   private final RSAPrivateKey privateKey;
   private final RSAPublicKey publicKey;
@@ -58,6 +66,7 @@ public class JwtHelper {
   public String createJwt(UserLogin user) {
 
     Map<String, String> claims = new HashMap<>();
+    claims.put("id", user.getId().toString());
     claims.put(
         "roles", user.getRoles().stream().map(Roles::getRole).collect(Collectors.joining(" ")));
     return createJwtForClaims(user.getUsername(), claims);
@@ -73,12 +82,41 @@ public class JwtHelper {
     // Add expiredAt and etc
     return jwtBuilder
         .withIssuedAt(new Date())
+        .withIssuer(JWT_ISSUER)
         .withExpiresAt(makeValidity())
         .sign(Algorithm.RSA256(publicKey, privateKey));
   }
 
-  public boolean validateToken(String token, UserLogin user) {
-    return (extractUsername(token).equals(user.getUsername()) && !isTokenExpired(token));
+  public boolean validateToken(String token) {
+    return !isTokenExpired(token);
+  }
+
+  public DecodedJWT verifyAndDecodeJwt(String token) {
+    DecodedJWT decodedJWT;
+    try {
+      JWTVerifier verifier =
+          JWT.require(Algorithm.RSA256(publicKey, privateKey)).withIssuer(JWT_ISSUER).build();
+      decodedJWT = verifier.verify(token);
+      return decodedJWT;
+    } catch (JWTVerificationException exception) {
+      log.error("JWT Verification Exception");
+    }
+    return null;
+  }
+
+  public Pair<Long, Collection<? extends GrantedAuthority>> getAuthenticatedUserDetails(
+      String token) {
+
+    var claims = extractAllClaims(token);
+
+    var userId = Long.parseLong(claims.get("id").asString());
+
+    var authorities =
+        Arrays.stream(claims.get("roles").asString().split(" "))
+            .map(SimpleGrantedAuthority::new)
+            .collect(Collectors.toSet());
+
+    return Pair.of(userId, authorities);
   }
 
   public boolean isTokenExpired(String token) {
@@ -86,14 +124,14 @@ public class JwtHelper {
   }
 
   public Date extractExpiration(String token) {
-    return JWT.decode(token).getExpiresAt();
+    return verifyAndDecodeJwt(token).getExpiresAt();
   }
 
   public String extractUsername(String token) {
-    return JWT.decode(token).getSubject();
+    return verifyAndDecodeJwt(token).getSubject();
   }
 
   public Map<String, Claim> extractAllClaims(String token) {
-    return JWT.decode(token).getClaims();
+    return verifyAndDecodeJwt(token).getClaims();
   }
 }
