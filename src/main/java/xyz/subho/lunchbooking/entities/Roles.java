@@ -86,42 +86,4 @@ public class Roles extends BaseEntity implements Serializable {
     return getClass().hashCode();
   }
 
-  public enum Role {
-    ADMINISTRATOR("ADMINISTRATOR"),
-    MANAGER("MANAGER"),
-    EMPLOYEE("EMPLOYEE"),
-    CATERER("CATERER");
-    private final String value;
-    private static final Map<String, Role> CONSTANTS = new HashMap<>();
-
-    static {
-      for (Roles.Role c : values()) {
-        CONSTANTS.put(c.value, c);
-      }
-    }
-
-    private Role(String value) {
-      this.value = value;
-    }
-
-    @Override
-    public String toString() {
-      return this.value;
-    }
-
-    @JsonValue
-    public String value() {
-      return this.value;
-    }
-
-    @JsonCreator
-    public static Roles.Role fromValue(String value) {
-      Roles.Role constant = CONSTANTS.get(value);
-      if (constant == null) {
-        throw new IllegalArgumentException(value);
-      } else {
-        return constant;
-      }
-    }
-  }
 }
