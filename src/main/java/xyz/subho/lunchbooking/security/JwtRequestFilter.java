@@ -21,6 +21,7 @@ package xyz.subho.lunchbooking.security;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import io.micrometer.core.instrument.util.StringUtils;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -72,11 +73,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
       if (jwtHelper.validateToken(jwtToken)) {
 
-        var authDetails = jwtHelper.getAuthenticatedUserDetails(jwtToken);
+        var authDetails = jwtHelper.getAuthenticatedUserDetails(jwtToken, username);
+
+        //Map<String, String> principal
 
         var authToken =
             new UsernamePasswordAuthenticationToken(
-                authDetails.getFirst(), null, authDetails.getSecond());
+                authDetails, jwtToken, authDetails.getAuthorities());
 
         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 

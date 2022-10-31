@@ -26,6 +26,7 @@ import javax.validation.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -43,6 +44,15 @@ public class GlobalExceptionHandlerController {
 
     ErrorDetails errorDetails = new ErrorDetails(ex.getMessage());
     return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler({
+          AccessDeniedException.class,
+  })
+  public ResponseEntity<ErrorDetails> handleAsAccessDenied(RuntimeException ex) {
+
+    ErrorDetails errorDetails = new ErrorDetails(ex.getMessage());
+    return new ResponseEntity<>(errorDetails, HttpStatus.FORBIDDEN);
   }
 
   @ExceptionHandler({

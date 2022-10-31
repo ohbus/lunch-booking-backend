@@ -31,8 +31,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.util.Pair;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import xyz.subho.lunchbooking.entities.Roles;
@@ -104,8 +102,8 @@ public class JwtHelper {
     return null;
   }
 
-  public Pair<Long, Collection<? extends GrantedAuthority>> getAuthenticatedUserDetails(
-      String token) {
+  public LunchBookingPrincipal getAuthenticatedUserDetails(
+      String token, String username) {
 
     var claims = extractAllClaims(token);
 
@@ -116,7 +114,12 @@ public class JwtHelper {
             .map(SimpleGrantedAuthority::new)
             .collect(Collectors.toSet());
 
-    return Pair.of(userId, authorities);
+
+    return LunchBookingPrincipal.builder()
+            .id(userId)
+            .username(username)
+            .authorities(authorities)
+            .build();
   }
 
   public boolean isTokenExpired(String token) {

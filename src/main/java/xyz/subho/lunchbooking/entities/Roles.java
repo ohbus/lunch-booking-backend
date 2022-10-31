@@ -51,10 +51,10 @@ public class Roles extends BaseEntity implements Serializable {
   public static final long EMPLOYEE = 3;
   public static final long CATERER = 4;
 
-  public static final String ROLE_ADMINISTRATOR = "ADMINISTRATOR";
-  public static final String ROLE_MANAGER = "MANAGER";
-  public static final String ROLE_EMPLOYEE = "EMPLOYEE";
-  public static final String ROLE_CATERER = "CATERER";
+  public static final String ROLE_ADMINISTRATOR = "ROLE_ADMINISTRATOR";
+  public static final String ROLE_MANAGER = "ROLE_MANAGER";
+  public static final String ROLE_EMPLOYEE = "ROLE_EMPLOYEE";
+  public static final String ROLE_CATERER = "ROLE_CATERER";
 
   @Column(name = "role", nullable = false, length = 32)
   @NaturalId
