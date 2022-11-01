@@ -173,13 +173,6 @@ public class MealsServiceImpl implements MealsService {
       log.error("Meal:{} is being tried to lock before being activated!", mealId);
       throw new InvalidMealOperation(String.format("Meal:%s is not Activated!", meal.getName()));
     }
-    if (!LocalDate.now().isEqual(meal.getDate())) {
-      log.error("Meal Date for:{} cannot be locked today!", meal.getDate());
-      throw new InvalidMealOperation(
-          String.format(
-              "Cannot Lock Meal:%s today. Can be locked only on:%s",
-              meal.getName(), meal.getDate()));
-    }
     meal.lock();
     log.debug("Meal ID:{} is being Locked", mealId);
     var mealModel = mealsRequestModelMapper.transform(meal);
@@ -243,7 +236,7 @@ public class MealsServiceImpl implements MealsService {
       throw new InvalidMealOperation(String.format("Meal:%s is not Locked!", meal.getName()));
     }
     if (!LocalDate.now().isEqual(meal.getDate())) {
-      log.error("Meal Date for:{} cannot be marked Ready today!", meal.getDate());
+      log.error("Meal ID:{} Date for:{} cannot be marked Ready today!",meal.getId(), meal.getDate());
       throw new InvalidMealOperation(
           String.format(
               "Cannot Ready Meal:%s today. Can be marked Ready only on:%s",
