@@ -102,8 +102,7 @@ public class JwtHelper {
     return null;
   }
 
-  public LunchBookingPrincipal getAuthenticatedUserDetails(
-      String token, String username) {
+  public LunchBookingPrincipal getAuthenticatedUserDetails(String token, String username) {
 
     var claims = extractAllClaims(token);
 
@@ -114,12 +113,11 @@ public class JwtHelper {
             .map(SimpleGrantedAuthority::new)
             .collect(Collectors.toSet());
 
-
     return LunchBookingPrincipal.builder()
-            .id(userId)
-            .username(username)
-            .authorities(authorities)
-            .build();
+        .id(userId)
+        .username(username)
+        .authorities(authorities)
+        .build();
   }
 
   public boolean isTokenExpired(String token) {

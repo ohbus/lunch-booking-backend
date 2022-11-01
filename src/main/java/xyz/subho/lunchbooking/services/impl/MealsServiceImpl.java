@@ -236,7 +236,8 @@ public class MealsServiceImpl implements MealsService {
       throw new InvalidMealOperation(String.format("Meal:%s is not Locked!", meal.getName()));
     }
     if (!LocalDate.now().isEqual(meal.getDate())) {
-      log.error("Meal ID:{} Date for:{} cannot be marked Ready today!",meal.getId(), meal.getDate());
+      log.error(
+          "Meal ID:{} Date for:{} cannot be marked Ready today!", meal.getId(), meal.getDate());
       throw new InvalidMealOperation(
           String.format(
               "Cannot Ready Meal:%s today. Can be marked Ready only on:%s",

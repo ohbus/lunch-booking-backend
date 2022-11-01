@@ -5,10 +5,5 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
 
 @Configuration
-@EnableGlobalMethodSecurity(
-        jsr250Enabled = true,
-        securedEnabled = true,
-        prePostEnabled = true
-)
-public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
-}
+@EnableGlobalMethodSecurity(jsr250Enabled = true, securedEnabled = true, prePostEnabled = true)
+public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {}

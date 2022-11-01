@@ -18,11 +18,7 @@
 
 package xyz.subho.lunchbooking.entities;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -119,5 +115,4 @@ public class Permissions extends BaseEntity implements Serializable, GrantedAuth
   public int hashCode() {
     return getClass().hashCode();
   }
-
 }

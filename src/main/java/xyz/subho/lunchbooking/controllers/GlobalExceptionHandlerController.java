@@ -47,7 +47,7 @@ public class GlobalExceptionHandlerController {
   }
 
   @ExceptionHandler({
-          AccessDeniedException.class,
+    AccessDeniedException.class,
   })
   public ResponseEntity<ErrorDetails> handleAsAccessDenied(RuntimeException ex) {
 

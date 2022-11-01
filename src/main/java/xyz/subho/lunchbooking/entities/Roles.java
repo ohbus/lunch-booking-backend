@@ -18,12 +18,8 @@
 
 package xyz.subho.lunchbooking.entities;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import javax.persistence.*;
@@ -85,5 +81,4 @@ public class Roles extends BaseEntity implements Serializable {
   public int hashCode() {
     return getClass().hashCode();
   }
-
 }

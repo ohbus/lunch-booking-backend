@@ -20,19 +20,15 @@ package xyz.subho.lunchbooking.controllers;
 
 import java.security.Principal;
 import java.util.List;
-import javax.annotation.security.RolesAllowed;
-import javax.security.auth.Subject;
 import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import xyz.subho.lunchbooking.entities.Roles;
 import xyz.subho.lunchbooking.models.AvailableOptionsResponseModel;
 import xyz.subho.lunchbooking.models.MealsModel;
-import xyz.subho.lunchbooking.security.LunchBookingPrincipal;
 import xyz.subho.lunchbooking.services.MealsService;
 
 @Slf4j
