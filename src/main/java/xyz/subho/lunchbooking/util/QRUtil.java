@@ -19,6 +19,7 @@
 package xyz.subho.lunchbooking.util;
 
 import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageConfig;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
@@ -26,6 +27,10 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.EnumMap;
+import java.util.Map;
+
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -40,8 +45,15 @@ public class QRUtil {
     byte[] pngData = new byte[0];
     ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream();
 
+    Map<EncodeHintType, Object> hints = new EnumMap<>(EncodeHintType.class);
+    hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
+    hints.put(EncodeHintType.MARGIN, 1);
+    hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
+    hints.put(EncodeHintType.QR_COMPACT, true);
+    hints.put(EncodeHintType.DATA_MATRIX_COMPACT, true);
+
     try {
-      BitMatrix bitMatrix = new QRCodeWriter().encode(text, BarcodeFormat.QR_CODE, width, height);
+      BitMatrix bitMatrix = new QRCodeWriter().encode(text, BarcodeFormat.QR_CODE, width, height, hints);
       MatrixToImageConfig con = new MatrixToImageConfig(0xFF000002, 0xFFFFC041);
       MatrixToImageWriter.writeToStream(bitMatrix, "PNG", pngOutputStream, con);
       pngData = pngOutputStream.toByteArray();
