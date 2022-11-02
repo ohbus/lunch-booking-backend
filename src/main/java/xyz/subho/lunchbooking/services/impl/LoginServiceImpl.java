@@ -378,7 +378,8 @@ public class LoginServiceImpl implements LoginService, UserDetailsService {
 
   @Override
   @Transactional
-  public UserLoginResponseModel validateOtp(@lombok.NonNull @Valid OtpRequestModel requestModel) {
+  public UserLoginResponseModel validateOtp(
+      @NonNull @Valid OtpRequestModel requestModel, boolean invalidateCredentials) {
     var otpEntityOpt = otpRepository.findById(requestModel.salt());
     if (otpEntityOpt.isPresent()) {
 
@@ -405,6 +406,9 @@ public class LoginServiceImpl implements LoginService, UserDetailsService {
                   "Lunch Booking Account Activated",
                   "Hey!\n\nYour account is now READY to use.\n\nCheers!"));
 
+          if (invalidateCredentials) {
+            user.setCredentialExpired(true);
+          }
           return login(new UserLoginRequestModel(user.getUsername(), user.getPassword()), true);
         }
         log.error("OTP:{} has expired", requestModel);

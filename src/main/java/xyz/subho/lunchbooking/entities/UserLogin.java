@@ -18,6 +18,7 @@
 
 package xyz.subho.lunchbooking.entities;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
@@ -27,6 +28,8 @@ import java.util.stream.Collectors;
 import javax.persistence.*;
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.NaturalIdCache;
 import org.springframework.security.core.GrantedAuthority;
@@ -43,9 +46,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 @NoArgsConstructor
 @With
 @NaturalIdCache
+@DynamicInsert
+@DynamicUpdate
 public class UserLogin extends BaseEntity implements UserDetails, Serializable {
 
-  private static final long serialVersionUID = -1484069631072335374L;
+  @Serial private static final long serialVersionUID = -1484069631072335374L;
 
   // User Name is the Email ID
   @Column(name = "username", nullable = false, unique = true, updatable = false, length = 128)

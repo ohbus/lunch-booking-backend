@@ -57,5 +57,6 @@ public interface LoginService {
 
   public OtpModel resendOtp(long salt);
 
-  public UserLoginResponseModel validateOtp(OtpRequestModel requestModel);
+  public UserLoginResponseModel validateOtp(
+      OtpRequestModel requestModel, boolean invalidateCredentials);
 }

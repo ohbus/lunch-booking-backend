@@ -18,6 +18,7 @@
 
 package xyz.subho.lunchbooking.entities;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Column;
@@ -27,6 +28,8 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.NaturalIdCache;
 import org.springframework.security.core.GrantedAuthority;
@@ -41,9 +44,11 @@ import org.springframework.security.core.GrantedAuthority;
 @NoArgsConstructor
 @With
 @NaturalIdCache
+@DynamicInsert
+@DynamicUpdate
 public class Permissions extends BaseEntity implements Serializable, GrantedAuthority {
 
-  private static final long serialVersionUID = 3053930796866104874L;
+  @Serial private static final long serialVersionUID = 3053930796866104874L;
 
   // USERS
   public static final long CREATE_USER = 1;

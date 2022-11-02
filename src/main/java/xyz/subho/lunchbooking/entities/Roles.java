@@ -18,6 +18,7 @@
 
 package xyz.subho.lunchbooking.entities;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
@@ -25,6 +26,8 @@ import java.util.Set;
 import javax.persistence.*;
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.NaturalIdCache;
 
@@ -38,9 +41,11 @@ import org.hibernate.annotations.NaturalIdCache;
 @NoArgsConstructor
 @With
 @NaturalIdCache
+@DynamicInsert
+@DynamicUpdate
 public class Roles extends BaseEntity implements Serializable {
 
-  private static final long serialVersionUID = 1466436830227018993L;
+  @Serial private static final long serialVersionUID = 1466436830227018993L;
 
   public static final long ADMINISTRATOR = 1;
   public static final long MANAGER = 2;

@@ -30,6 +30,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.With;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -43,6 +45,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 @AllArgsConstructor
 @NoArgsConstructor
 @With
+@DynamicInsert
+@DynamicUpdate
 public class BaseEntity {
 
   @Id

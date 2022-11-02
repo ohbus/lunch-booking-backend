@@ -29,6 +29,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
 @Table(
@@ -39,6 +41,8 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @With
+@DynamicInsert
+@DynamicUpdate
 public class MealOptions extends BaseEntity implements Serializable {
 
   @Serial private static final long serialVersionUID = -6473537837965565355L;

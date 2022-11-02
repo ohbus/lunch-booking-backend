@@ -51,8 +51,10 @@ public class LoginController {
   }
 
   @PutMapping(EndpointPropertyKey.LOGIN_OTP_VALIDATE)
-  public UserLoginResponseModel validateOtp(@RequestBody @Valid OtpRequestModel otpRequestModel) {
-    return loginService.validateOtp(otpRequestModel);
+  public UserLoginResponseModel validateOtp(
+      @RequestBody @Valid OtpRequestModel otpRequestModel,
+      @RequestHeader(name = "x-otp-validate", required = false) boolean forget) {
+    return loginService.validateOtp(otpRequestModel, forget);
   }
 
   @PostMapping(EndpointPropertyKey.LOGIN_OTP_RESEND)

@@ -19,6 +19,7 @@
 package xyz.subho.lunchbooking.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -28,6 +29,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.NaturalIdCache;
 
@@ -44,9 +47,11 @@ import org.hibernate.annotations.NaturalIdCache;
 @NoArgsConstructor
 @With
 @NaturalIdCache
+@DynamicInsert
+@DynamicUpdate
 public class Meals extends BaseEntity implements Serializable {
 
-  private static final long serialVersionUID = -657646258883261176L;
+  @Serial private static final long serialVersionUID = -657646258883261176L;
 
   @Column(length = 30, nullable = false)
   @NotNull
