@@ -60,20 +60,15 @@ public class UserLogin extends BaseEntity implements UserDetails, Serializable {
   @Column(name = "salt", nullable = false, length = 256)
   private String salt;
 
-  @Column(columnDefinition = "boolean default false", nullable = false)
-  private boolean expired = false;
+  private Long expiredAt;
 
-  @Column(columnDefinition = "boolean default false", nullable = false)
-  private boolean locked = false;
+  private Long lockedAt;
 
-  @Column(columnDefinition = "boolean default false", nullable = false)
-  private boolean credentialExpired = false;
+  private Long credentialExpiredAt;
 
-  @Column(columnDefinition = "boolean default false", nullable = false)
-  private boolean enabled = false;
+  private Long enabledAt;
 
-  @Column(columnDefinition = "boolean default false", nullable = false)
-  private boolean secured = false;
+  private Long securedAt;
 
   @Basic private Long currentLogin;
 
@@ -85,6 +80,46 @@ public class UserLogin extends BaseEntity implements UserDetails, Serializable {
       joinColumns = @JoinColumn(name = "user_id"),
       inverseJoinColumns = @JoinColumn(name = "role_id"))
   private Set<Roles> roles = new HashSet<>();
+
+  public void expireAccount() {
+    expiredAt = System.currentTimeMillis();
+  }
+
+  public void unExpireAccount() {
+    expiredAt = null;
+  }
+
+  public void lock() {
+    lockedAt = System.currentTimeMillis();
+  }
+
+  public void unlock() {
+    lockedAt = null;
+  }
+
+  public void expireCredentials() {
+    credentialExpiredAt = System.currentTimeMillis();
+  }
+
+  public void unExpireCredentials() {
+    credentialExpiredAt = null;
+  }
+
+  public void enable() {
+    enabledAt = System.currentTimeMillis();
+  }
+
+  public void disable() {
+    enabledAt = null;
+  }
+
+  public void secure() {
+    securedAt = System.currentTimeMillis();
+  }
+
+  public void unsecure() {
+    securedAt = null;
+  }
 
   public long makeNewLogin() {
 
@@ -106,22 +141,22 @@ public class UserLogin extends BaseEntity implements UserDetails, Serializable {
 
   @Override
   public boolean isAccountNonExpired() {
-    return !expired;
+    return Objects.isNull(expiredAt);
   }
 
   @Override
   public boolean isAccountNonLocked() {
-    return !locked;
+    return Objects.isNull(lockedAt);
   }
 
   @Override
   public boolean isCredentialsNonExpired() {
-    return !credentialExpired;
+    return Objects.isNull(credentialExpiredAt);
   }
 
   @Override
   public boolean isEnabled() {
-    return enabled;
+    return Objects.nonNull(enabledAt);
   }
 
   @Override
