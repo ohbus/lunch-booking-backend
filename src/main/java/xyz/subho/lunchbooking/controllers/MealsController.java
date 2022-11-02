@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
-import xyz.subho.lunchbooking.entities.Roles;
+import xyz.subho.lunchbooking.entities.security.Roles;
 import xyz.subho.lunchbooking.models.AvailableOptionsResponseModel;
 import xyz.subho.lunchbooking.models.MealsModel;
 import xyz.subho.lunchbooking.services.MealsService;

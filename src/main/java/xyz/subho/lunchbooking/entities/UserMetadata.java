@@ -28,8 +28,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.NaturalIdCache;
 
@@ -48,8 +46,6 @@ import org.hibernate.annotations.NaturalIdCache;
 @NoArgsConstructor
 @With
 @NaturalIdCache
-@DynamicInsert
-@DynamicUpdate
 public class UserMetadata extends BaseEntity implements Serializable {
 
   @Serial private static final long serialVersionUID = -8209621126460711059L;

@@ -24,8 +24,6 @@ import java.time.LocalDate;
 import java.util.Objects;
 import javax.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
 @Table(
@@ -39,8 +37,6 @@ import org.hibernate.annotations.DynamicUpdate;
 @AllArgsConstructor
 @NoArgsConstructor
 @With
-@DynamicInsert
-@DynamicUpdate
 public class AvailableBookings extends BaseEntity implements Serializable {
 
   @Serial private static final long serialVersionUID = 796866104874L;

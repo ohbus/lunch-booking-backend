@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package xyz.subho.lunchbooking.entities;
+package xyz.subho.lunchbooking.entities.security;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -28,11 +28,10 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.NaturalIdCache;
 import org.springframework.security.core.GrantedAuthority;
+import xyz.subho.lunchbooking.entities.BaseEntity;
 
 @Entity
 @Table(
@@ -44,8 +43,6 @@ import org.springframework.security.core.GrantedAuthority;
 @NoArgsConstructor
 @With
 @NaturalIdCache
-@DynamicInsert
-@DynamicUpdate
 public class Permissions extends BaseEntity implements Serializable, GrantedAuthority {
 
   @Serial private static final long serialVersionUID = 3053930796866104874L;

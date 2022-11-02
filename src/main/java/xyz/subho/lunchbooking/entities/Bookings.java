@@ -25,8 +25,6 @@ import java.util.Objects;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import lombok.*;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
 @Table(
@@ -40,8 +38,6 @@ import org.hibernate.annotations.DynamicUpdate;
 @AllArgsConstructor
 @NoArgsConstructor
 @With
-@DynamicInsert
-@DynamicUpdate
 public class Bookings extends BaseEntity implements Serializable {
 
   @Serial private static final long serialVersionUID = -9138314713309636521L;

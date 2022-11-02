@@ -28,8 +28,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import lombok.*;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.lang.NonNull;
 
 @Entity
@@ -38,8 +36,6 @@ import org.springframework.lang.NonNull;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@DynamicInsert
-@DynamicUpdate
 public class OtpEntity implements Serializable {
 
   @Serial private static final long serialVersionUID = 6104874L;

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package xyz.subho.lunchbooking.entities;
+package xyz.subho.lunchbooking.entities.security;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -28,13 +28,12 @@ import java.util.stream.Collectors;
 import javax.persistence.*;
 import lombok.*;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.NaturalIdCache;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import xyz.subho.lunchbooking.entities.BaseEntity;
 
 @Entity
 @Table(
@@ -46,8 +45,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 @NoArgsConstructor
 @With
 @NaturalIdCache
-@DynamicInsert
-@DynamicUpdate
 public class UserLogin extends BaseEntity implements UserDetails, Serializable {
 
   @Serial private static final long serialVersionUID = -1484069631072335374L;

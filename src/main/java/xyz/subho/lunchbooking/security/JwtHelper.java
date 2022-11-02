@@ -33,8 +33,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
-import xyz.subho.lunchbooking.entities.Roles;
-import xyz.subho.lunchbooking.entities.UserLogin;
+import xyz.subho.lunchbooking.entities.security.Roles;
+import xyz.subho.lunchbooking.entities.security.UserLogin;
 
 @Slf4j
 @Component

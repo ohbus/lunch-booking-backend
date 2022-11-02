@@ -35,6 +35,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import xyz.subho.lunchbooking.entities.*;
+import xyz.subho.lunchbooking.entities.security.Roles;
 import xyz.subho.lunchbooking.exceptions.BookingNotFoundException;
 import xyz.subho.lunchbooking.exceptions.InvalidBookingOperation;
 import xyz.subho.lunchbooking.exceptions.SelectionLockedException;
