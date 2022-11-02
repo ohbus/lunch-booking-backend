@@ -79,7 +79,7 @@ public class UserLogin extends BaseEntity implements UserDetails, Serializable {
       name = "users_roles",
       joinColumns = @JoinColumn(name = "user_id"),
       inverseJoinColumns = @JoinColumn(name = "role_id"))
-  private Set<Roles> roles = new HashSet<>();
+  private Set<Roles> roles = new HashSet<>(4, 1);
 
   public void expireAccount() {
     expiredAt = System.currentTimeMillis();

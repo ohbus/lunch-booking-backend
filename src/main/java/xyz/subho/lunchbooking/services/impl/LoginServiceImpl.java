@@ -335,7 +335,6 @@ public class LoginServiceImpl implements LoginService, UserDetailsService {
   @Transactional
   public OtpModel createOtp(long userId, String email) {
     var newOtp = new OtpEntity(userId);
-    newOtp.setExpiresAt(LocalDateTime.now().plusMinutes(Long.parseLong(expiryInMinutes)));
 
     var otp = new SecureRandom().nextInt(100000, 999999);
     newOtp.setOtp(otp);
@@ -348,6 +347,7 @@ public class LoginServiceImpl implements LoginService, UserDetailsService {
     newOtp.send();
 
     newOtp.issue();
+    newOtp.setExpiresAt(LocalDateTime.now().plusMinutes(Long.parseLong(expiryInMinutes)));
     otpRepository.save(newOtp);
     return new OtpModel(newOtp.getId());
   }

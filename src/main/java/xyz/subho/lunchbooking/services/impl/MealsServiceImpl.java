@@ -21,7 +21,6 @@ package xyz.subho.lunchbooking.services.impl;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.mail.util.ByteArrayDataSource;
 import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +43,7 @@ import xyz.subho.lunchbooking.repositories.MealOptionsRepository;
 import xyz.subho.lunchbooking.repositories.MealsRepository;
 import xyz.subho.lunchbooking.services.MailService;
 import xyz.subho.lunchbooking.services.MealsService;
-import xyz.subho.lunchbooking.util.QRUtil;
+import xyz.subho.lunchbooking.util.MailComposeUtil;
 
 @Slf4j
 @Service
@@ -180,6 +179,36 @@ public class MealsServiceImpl implements MealsService {
     return mealModel;
   }
 
+  @Async
+  protected void sendCountEmails(MealsModel meal) {
+    var email = new Email();
+    var totalCount =
+        meal.getMealOptions().stream()
+            .map(MealOptionsModel::getCount)
+            .mapToInt(Integer::intValue)
+            .sum();
+
+    var bodyPrelude =
+        String.format("Hi,%n%nMeal Details: %s%nOptions with Count as follows:%n", meal.getName());
+    var bodyInterlude =
+        meal.getMealOptions().stream()
+            .map(
+                mealOptionsModel ->
+                    Pair.of(mealOptionsModel.getName(), mealOptionsModel.getCount()))
+            .map(
+                mealOption ->
+                    String.format("%s :: %s", mealOption.getFirst(), mealOption.getSecond()))
+            .collect(Collectors.joining("\n"));
+    var bodyPostlude = String.format("%n%nTotal Count :: %s%n%nCheers.", totalCount);
+
+    new ArrayList<>(Arrays.asList(managerToAddresses.split(","))).forEach(email::addRecipient);
+    new ArrayList<>(Arrays.asList(managerCcAddresses.split(","))).forEach(email::addCc);
+    email.setSubject(String.format("Lunch Booking for %s", meal.getDate()));
+    email.setBody(String.format("%s%s%s", bodyPrelude, bodyInterlude, bodyPostlude));
+
+    mailService.sendMail(email);
+  }
+
   @Override
   @Transactional
   public MealsModel unlockMeal(long mealId) {
@@ -251,36 +280,6 @@ public class MealsServiceImpl implements MealsService {
   }
 
   @Async
-  protected void sendCountEmails(MealsModel meal) {
-    var email = new Email();
-    var totalCount =
-        meal.getMealOptions().stream()
-            .map(MealOptionsModel::getCount)
-            .mapToInt(Integer::intValue)
-            .sum();
-
-    var bodyPrelude =
-        String.format("Hi,%n%nMeal Details: %s%nOptions with Count as follows:%n", meal.getName());
-    var bodyInterlude =
-        meal.getMealOptions().stream()
-            .map(
-                mealOptionsModel ->
-                    Pair.of(mealOptionsModel.getName(), mealOptionsModel.getCount()))
-            .map(
-                mealOption ->
-                    String.format("%s :: %s", mealOption.getFirst(), mealOption.getSecond()))
-            .collect(Collectors.joining("\n"));
-    var bodyPostlude = String.format("%n%nTotal Count :: %s%n%nCheers.", totalCount);
-
-    new ArrayList<>(Arrays.asList(managerToAddresses.split(","))).forEach(email::addRecipient);
-    new ArrayList<>(Arrays.asList(managerCcAddresses.split(","))).forEach(email::addCc);
-    email.setSubject(String.format("Lunch Booking for %s", meal.getDate()));
-    email.setBody(String.format("%s%s%s", bodyPrelude, bodyInterlude, bodyPostlude));
-
-    mailService.sendMail(email);
-  }
-
-  @Async
   protected void sendReadyEmails(Meals meal) {
 
     var bookingList = bookingRepository.findByDateAndCancelledAtNull(meal.getDate());
@@ -289,22 +288,10 @@ public class MealsServiceImpl implements MealsService {
         booking -> {
           var user = booking.getUser();
           var bookingModel = bookingResponseModelMapper.transform(booking);
-          var bookingId = Long.toString(booking.getId());
 
           log.debug("Sending QR Booking Information to:{}", user.getEmailId());
           mailService.sendMail(
-              new Email(
-                  user.getEmailId(),
-                  String.format("Lunch is Ready for Today %s", booking.getDate()),
-                  String.format(
-                      "Hey %s %s,%n%nPFA Coupon for your today's meal %s with Option %s.%n%nCheers!!",
-                      bookingModel.firstName(),
-                      bookingModel.lastName(),
-                      meal.getName(),
-                      bookingModel.mealOption()),
-                  bookingId + ".png",
-                  new ByteArrayDataSource(
-                      QRUtil.getQRCodeImage(bookingId, 500, 500), "application/octet-stream")));
+              MailComposeUtil.prepareReadyEmails(user.getEmailId(), bookingModel, meal));
         });
   }
 
