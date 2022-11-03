@@ -66,7 +66,7 @@ public class JwtHelper {
     Map<String, String> claims = new HashMap<>();
     claims.put("id", user.getId().toString());
     claims.put(
-        "roles", user.getRoles().stream().map(Roles::getRole).collect(Collectors.joining(" ")));
+        "atz", user.getRoles().stream().map(Roles::getRole).collect(Collectors.joining(" ")));
     return createJwtForClaims(user.getUsername(), claims);
   }
 
@@ -109,7 +109,7 @@ public class JwtHelper {
     var userId = Long.parseLong(claims.get("id").asString());
 
     var authorities =
-        Arrays.stream(claims.get("roles").asString().split(" "))
+        Arrays.stream(claims.get("atz").asString().split(" "))
             .map(SimpleGrantedAuthority::new)
             .collect(Collectors.toSet());
 
