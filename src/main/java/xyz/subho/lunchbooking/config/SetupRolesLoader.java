@@ -29,8 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import xyz.subho.lunchbooking.entities.Permissions;
-import xyz.subho.lunchbooking.entities.Roles;
+import xyz.subho.lunchbooking.entities.security.Permissions;
+import xyz.subho.lunchbooking.entities.security.Roles;
 import xyz.subho.lunchbooking.repositories.PermissionRepository;
 import xyz.subho.lunchbooking.repositories.RolesRepository;
 

@@ -19,6 +19,7 @@
 package xyz.subho.lunchbooking.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -46,7 +47,7 @@ import org.hibernate.annotations.NaturalIdCache;
 @NaturalIdCache
 public class Meals extends BaseEntity implements Serializable {
 
-  private static final long serialVersionUID = -657646258883261176L;
+  @Serial private static final long serialVersionUID = -657646258883261176L;
 
   @Column(length = 30, nullable = false)
   @NotNull

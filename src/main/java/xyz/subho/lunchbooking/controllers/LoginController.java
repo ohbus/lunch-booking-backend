@@ -22,8 +22,11 @@ import java.security.Principal;
 import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import xyz.subho.lunchbooking.exceptions.InvalidUsernameException;
 import xyz.subho.lunchbooking.models.*;
 import xyz.subho.lunchbooking.services.LoginService;
 
@@ -33,11 +36,22 @@ public class LoginController {
 
   @Autowired private LoginService loginService;
 
+  @Value("${app.signup.email.allowed.domain:subho.xyz}")
+  private String allowedDomain;
+
   @PostMapping(EndpointPropertyKey.LOGIN_USER_REGISTRATION)
   @ResponseStatus(code = HttpStatus.CREATED)
   public OtpModel registerUser(@RequestBody @Valid UserRegistrationModel user) {
     log.debug("Initializing User Registration for:{}", user.getEmailId());
-    return loginService.createUser(user);
+
+    if (StringUtils.endsWithIgnoreCase(user.getEmailId(), String.format("@%s", allowedDomain))) {
+      return loginService.createUser(user);
+    }
+    log.warn("User: {} is trying to register using unauthorized domains", user.getEmailId());
+    throw new InvalidUsernameException(
+        String.format(
+            "Email :%s is NOT valid for registration. Please register from a @%s email only",
+            user.getEmailId(), allowedDomain));
   }
 
   @PostMapping(EndpointPropertyKey.LOGIN_USER)
@@ -51,8 +65,10 @@ public class LoginController {
   }
 
   @PutMapping(EndpointPropertyKey.LOGIN_OTP_VALIDATE)
-  public UserLoginResponseModel validateOtp(@RequestBody @Valid OtpRequestModel otpRequestModel) {
-    return loginService.validateOtp(otpRequestModel);
+  public UserLoginResponseModel validateOtp(
+      @RequestBody @Valid OtpRequestModel otpRequestModel,
+      @RequestHeader(name = "x-otp-validate-forget") boolean forget) {
+    return loginService.validateOtp(otpRequestModel, forget);
   }
 
   @PostMapping(EndpointPropertyKey.LOGIN_OTP_RESEND)

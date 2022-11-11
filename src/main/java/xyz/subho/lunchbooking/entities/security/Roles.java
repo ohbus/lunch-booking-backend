@@ -16,8 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package xyz.subho.lunchbooking.entities;
+package xyz.subho.lunchbooking.entities.security;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
@@ -27,6 +28,7 @@ import lombok.*;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.NaturalIdCache;
+import xyz.subho.lunchbooking.entities.BaseEntity;
 
 @Entity
 @Table(
@@ -40,7 +42,7 @@ import org.hibernate.annotations.NaturalIdCache;
 @NaturalIdCache
 public class Roles extends BaseEntity implements Serializable {
 
-  private static final long serialVersionUID = 1466436830227018993L;
+  @Serial private static final long serialVersionUID = 1466436830227018993L;
 
   public static final long ADMINISTRATOR = 1;
   public static final long MANAGER = 2;

@@ -34,9 +34,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import xyz.subho.lunchbooking.entities.OtpEntity;
-import xyz.subho.lunchbooking.entities.Roles;
-import xyz.subho.lunchbooking.entities.UserLogin;
 import xyz.subho.lunchbooking.entities.UserMetadata;
+import xyz.subho.lunchbooking.entities.security.Roles;
+import xyz.subho.lunchbooking.entities.security.UserLogin;
 import xyz.subho.lunchbooking.exceptions.*;
 import xyz.subho.lunchbooking.mapper.Mapper;
 import xyz.subho.lunchbooking.models.*;
@@ -178,15 +178,15 @@ public class LoginServiceImpl implements LoginService, UserDetailsService {
       errorMsg = String.format(msgTemplate, username, "Not Enabled");
       log.error(errorMsg);
       throw new InvalidLoginException(errorMsg);
-    } else if (userLogin.isExpired()) {
+    } else if (!userLogin.isAccountNonExpired()) {
       errorMsg = String.format(msgTemplate, username, "Expired");
       log.error(errorMsg);
       throw new InvalidLoginException(errorMsg);
-    } else if (userLogin.isLocked()) {
+    } else if (!userLogin.isAccountNonLocked()) {
       errorMsg = String.format(msgTemplate, username, "Locked");
       log.error(errorMsg);
       throw new InvalidLoginException(errorMsg);
-    } else if (userLogin.isCredentialExpired()) {
+    } else if (!userLogin.isCredentialsNonExpired()) {
       errorMsg = String.format(msgTemplate, username, "Credential Expired");
       log.error(errorMsg);
       throw new InvalidLoginException(errorMsg);
@@ -327,6 +327,7 @@ public class LoginServiceImpl implements LoginService, UserDetailsService {
     final String salt = encryptionService.generateSalt(Integer.parseInt(saltSize));
     user.setPassword(encryptionService.encrypt(newPassword, salt));
     user.setSalt(salt);
+    user.unExpireCredentials();
     log.debug("Password has been updated for User ID:{}", userId);
   }
 
@@ -334,7 +335,6 @@ public class LoginServiceImpl implements LoginService, UserDetailsService {
   @Transactional
   public OtpModel createOtp(long userId, String email) {
     var newOtp = new OtpEntity(userId);
-    newOtp.setExpiresAt(LocalDateTime.now().plusMinutes(Long.parseLong(expiryInMinutes)));
 
     var otp = new SecureRandom().nextInt(100000, 999999);
     newOtp.setOtp(otp);
@@ -347,6 +347,7 @@ public class LoginServiceImpl implements LoginService, UserDetailsService {
     newOtp.send();
 
     newOtp.issue();
+    newOtp.setExpiresAt(LocalDateTime.now().plusMinutes(Long.parseLong(expiryInMinutes)));
     otpRepository.save(newOtp);
     return new OtpModel(newOtp.getId());
   }
@@ -378,7 +379,8 @@ public class LoginServiceImpl implements LoginService, UserDetailsService {
 
   @Override
   @Transactional
-  public UserLoginResponseModel validateOtp(@lombok.NonNull @Valid OtpRequestModel requestModel) {
+  public UserLoginResponseModel validateOtp(
+      @NonNull @Valid OtpRequestModel requestModel, boolean invalidateCredentials) {
     var otpEntityOpt = otpRepository.findById(requestModel.salt());
     if (otpEntityOpt.isPresent()) {
 
@@ -397,14 +399,17 @@ public class LoginServiceImpl implements LoginService, UserDetailsService {
               "OTP:{} has been verified for User ID:{}", requestModel.salt(), otp.getUserId());
 
           var user = getUserById(otp.getUserId());
-          user.setEnabled(true);
-          user.setSecured(true);
+          user.enable();
+          user.secure();
           mailService.sendMail(
               new Email(
                   user.getUsername(),
                   "Lunch Booking Account Activated",
                   "Hey!\n\nYour account is now READY to use.\n\nCheers!"));
 
+          if (invalidateCredentials) {
+            user.expireCredentials();
+          }
           return login(new UserLoginRequestModel(user.getUsername(), user.getPassword()), true);
         }
         log.error("OTP:{} has expired", requestModel);

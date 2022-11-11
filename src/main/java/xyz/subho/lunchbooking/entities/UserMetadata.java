@@ -19,6 +19,7 @@
 package xyz.subho.lunchbooking.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
@@ -47,7 +48,7 @@ import org.hibernate.annotations.NaturalIdCache;
 @NaturalIdCache
 public class UserMetadata extends BaseEntity implements Serializable {
 
-  private static final long serialVersionUID = -8209621126460711059L;
+  @Serial private static final long serialVersionUID = -8209621126460711059L;
 
   @Column(length = 50, nullable = false)
   @NotNull
@@ -65,10 +66,24 @@ public class UserMetadata extends BaseEntity implements Serializable {
   @Column(length = 15, unique = true)
   private String mobile;
 
+  private Long subscribedAt;
+
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JsonIgnore
   @ToString.Exclude
   private Set<Bookings> bookings = new HashSet<>();
+
+  public boolean isSubscribed() {
+    return Objects.nonNull(subscribedAt);
+  }
+
+  public void subscribe() {
+    subscribedAt = System.currentTimeMillis();
+  }
+
+  public void unsubscribe() {
+    subscribedAt = null;
+  }
 
   @Override
   public boolean equals(Object o) {

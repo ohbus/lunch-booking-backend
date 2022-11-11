@@ -18,6 +18,7 @@
 
 package xyz.subho.lunchbooking.entities;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -25,16 +26,19 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.Hibernate;
 import org.springframework.lang.NonNull;
 
 @Entity
-@Data
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 public class OtpEntity implements Serializable {
+
+  @Serial private static final long serialVersionUID = 6104874L;
 
   @Id @GeneratedValue Long id;
 
@@ -94,5 +98,18 @@ public class OtpEntity implements Serializable {
 
   public void resend() {
     resentAt = LocalDateTime.now();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+    OtpEntity otpEntity = (OtpEntity) o;
+    return id != null && Objects.equals(id, otpEntity.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
   }
 }

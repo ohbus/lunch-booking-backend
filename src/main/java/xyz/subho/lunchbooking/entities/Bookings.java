@@ -18,6 +18,7 @@
 
 package xyz.subho.lunchbooking.entities;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -39,7 +40,7 @@ import lombok.*;
 @With
 public class Bookings extends BaseEntity implements Serializable {
 
-  private static final long serialVersionUID = -9138314713309636521L;
+  @Serial private static final long serialVersionUID = -9138314713309636521L;
 
   @ManyToOne(optional = false)
   @JoinColumn(name = "users_id", updatable = false, nullable = false)

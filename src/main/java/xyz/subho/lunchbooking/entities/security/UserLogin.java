@@ -16,8 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package xyz.subho.lunchbooking.entities;
+package xyz.subho.lunchbooking.entities.security;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
@@ -32,6 +33,7 @@ import org.hibernate.annotations.NaturalIdCache;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import xyz.subho.lunchbooking.entities.BaseEntity;
 
 @Entity
 @Table(
@@ -45,7 +47,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @NaturalIdCache
 public class UserLogin extends BaseEntity implements UserDetails, Serializable {
 
-  private static final long serialVersionUID = -1484069631072335374L;
+  @Serial private static final long serialVersionUID = -1484069631072335374L;
 
   // User Name is the Email ID
   @Column(name = "username", nullable = false, unique = true, updatable = false, length = 128)
@@ -58,20 +60,15 @@ public class UserLogin extends BaseEntity implements UserDetails, Serializable {
   @Column(name = "salt", nullable = false, length = 256)
   private String salt;
 
-  @Column(columnDefinition = "boolean default false", nullable = false)
-  private boolean expired = false;
+  private Long expiredAt;
 
-  @Column(columnDefinition = "boolean default false", nullable = false)
-  private boolean locked = false;
+  private Long lockedAt;
 
-  @Column(columnDefinition = "boolean default false", nullable = false)
-  private boolean credentialExpired = false;
+  private Long credentialExpiredAt;
 
-  @Column(columnDefinition = "boolean default false", nullable = false)
-  private boolean enabled = false;
+  private Long enabledAt;
 
-  @Column(columnDefinition = "boolean default false", nullable = false)
-  private boolean secured = false;
+  private Long securedAt;
 
   @Basic private Long currentLogin;
 
@@ -82,7 +79,47 @@ public class UserLogin extends BaseEntity implements UserDetails, Serializable {
       name = "users_roles",
       joinColumns = @JoinColumn(name = "user_id"),
       inverseJoinColumns = @JoinColumn(name = "role_id"))
-  private Set<Roles> roles = new HashSet<>();
+  private Set<Roles> roles = new HashSet<>(4, 1);
+
+  public void expireAccount() {
+    expiredAt = System.currentTimeMillis();
+  }
+
+  public void unExpireAccount() {
+    expiredAt = null;
+  }
+
+  public void lock() {
+    lockedAt = System.currentTimeMillis();
+  }
+
+  public void unlock() {
+    lockedAt = null;
+  }
+
+  public void expireCredentials() {
+    credentialExpiredAt = System.currentTimeMillis();
+  }
+
+  public void unExpireCredentials() {
+    credentialExpiredAt = null;
+  }
+
+  public void enable() {
+    enabledAt = System.currentTimeMillis();
+  }
+
+  public void disable() {
+    enabledAt = null;
+  }
+
+  public void secure() {
+    securedAt = System.currentTimeMillis();
+  }
+
+  public void unsecure() {
+    securedAt = null;
+  }
 
   public long makeNewLogin() {
 
@@ -104,22 +141,22 @@ public class UserLogin extends BaseEntity implements UserDetails, Serializable {
 
   @Override
   public boolean isAccountNonExpired() {
-    return !expired;
+    return Objects.isNull(expiredAt);
   }
 
   @Override
   public boolean isAccountNonLocked() {
-    return !locked;
+    return Objects.isNull(lockedAt);
   }
 
   @Override
   public boolean isCredentialsNonExpired() {
-    return !credentialExpired;
+    return Objects.isNull(credentialExpiredAt);
   }
 
   @Override
   public boolean isEnabled() {
-    return enabled;
+    return Objects.nonNull(enabledAt);
   }
 
   @Override

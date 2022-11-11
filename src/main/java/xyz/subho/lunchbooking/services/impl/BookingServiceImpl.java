@@ -31,8 +31,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import xyz.subho.lunchbooking.entities.*;
+import xyz.subho.lunchbooking.entities.security.Roles;
 import xyz.subho.lunchbooking.exceptions.BookingNotFoundException;
 import xyz.subho.lunchbooking.exceptions.InvalidBookingOperation;
 import xyz.subho.lunchbooking.exceptions.SelectionLockedException;
@@ -339,6 +342,20 @@ public class BookingServiceImpl implements BookingService {
   }
 
   private void checkIfBookingOwnedByUser(Bookings booking, UserMetadata user) {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    if (auth != null
+        && auth.getAuthorities().stream()
+            .anyMatch(
+                a ->
+                    a.getAuthority().equals(Roles.ROLE_ADMINISTRATOR)
+                        || a.getAuthority().equals(Roles.ROLE_MANAGER)
+                        || a.getAuthority().equals(Roles.CATERER))) {
+      log.debug(
+          "User :{} is not an employee, thus can cancel the Booking ID:{}",
+          auth.getName(),
+          booking.getId());
+      return;
+    }
     log.debug("Checking if Booking ID:{} is owned by User ID:{}", booking.getId(), user.getId());
     if (!booking.getUser().equals(user)) {
       log.error("Booking ID:{} does not belong to User ID:{}", booking.getId(), user.getId());

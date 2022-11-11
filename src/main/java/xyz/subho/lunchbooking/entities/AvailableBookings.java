@@ -18,6 +18,7 @@
 
 package xyz.subho.lunchbooking.entities;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -27,7 +28,10 @@ import lombok.*;
 @Entity
 @Table(
     name = "available_bookings",
-    indexes = {@Index(columnList = "date", name = "date")})
+    indexes = {
+      @Index(columnList = "date", name = "date"),
+      @Index(columnList = "meal_options_id", name = "meal_options")
+    })
 @Getter
 @Setter
 @AllArgsConstructor
@@ -35,11 +39,13 @@ import lombok.*;
 @With
 public class AvailableBookings extends BaseEntity implements Serializable {
 
+  @Serial private static final long serialVersionUID = 796866104874L;
+
   @Column(nullable = false, updatable = false)
   LocalDate date;
 
   @ManyToOne
-  @JoinColumn(name = "meal_options_id", updatable = false, nullable = false)
+  @JoinColumn(name = "meal_options_id", updatable = false, nullable = false, unique = true)
   MealOptions mealOptions;
 
   int count = 1;

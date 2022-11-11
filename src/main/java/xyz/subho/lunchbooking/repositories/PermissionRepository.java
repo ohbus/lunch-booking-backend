@@ -20,7 +20,7 @@ package xyz.subho.lunchbooking.repositories;
 
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
-import xyz.subho.lunchbooking.entities.Permissions;
+import xyz.subho.lunchbooking.entities.security.Permissions;
 
 public interface PermissionRepository extends JpaRepository<Permissions, Long> {
 
