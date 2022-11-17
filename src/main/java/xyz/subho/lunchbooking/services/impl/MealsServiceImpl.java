@@ -20,6 +20,9 @@ package xyz.subho.lunchbooking.services.impl;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -353,6 +356,51 @@ public class MealsServiceImpl implements MealsService {
     return !result.isEmpty()
         ? result.stream().map(meals -> mealsRequestModelMapper.transform(meals)).toList()
         : new ArrayList<>();
+  }
+
+  @Override
+  public MealAvailableCountModel getMealCountByMealId(long mealId) {
+
+    var meal = getMealById(mealId);
+    var date = meal.getDate();
+
+    Map<Long, MealOptionCountModel> countData = new HashMap<>();
+
+    meal.getMealOptions()
+        .forEach(
+            mealOptions -> {
+              var mealOptionId = mealOptions.getId();
+              var total = mealOptions.getCount();
+
+              AtomicInteger claimed = new AtomicInteger();
+              AtomicInteger available = new AtomicInteger();
+
+              try {
+                CompletableFuture.allOf(
+                        CompletableFuture.supplyAsync(
+                                () ->
+                                    bookingRepository
+                                        .countByDateAndMealOptions_IdAndCancelledAtNullAndClaimedAtNotNull(
+                                            date, mealOptionId))
+                            .thenAccept(claimed::set),
+                        CompletableFuture.supplyAsync(
+                                () ->
+                                    bookingRepository
+                                        .countByDateAndMealOptions_IdAndCancelledAtNullAndClaimedAtNull(
+                                            date, mealOptionId))
+                            .thenAccept(available::set))
+                    .get();
+              } catch (ExecutionException | InterruptedException e) {
+                log.warn("Thread Interrupted while fetching count queries");
+                Thread.currentThread().interrupt();
+                throw new InvalidMealOperation("Meal Count could not be fetched");
+              }
+
+              countData.put(
+                  mealOptionId, new MealOptionCountModel(claimed.get(), available.get(), total));
+            });
+
+    return new MealAvailableCountModel(countData);
   }
 
   @Override

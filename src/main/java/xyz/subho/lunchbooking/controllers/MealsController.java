@@ -28,6 +28,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import xyz.subho.lunchbooking.entities.security.Roles;
 import xyz.subho.lunchbooking.models.AvailableOptionsResponseModel;
+import xyz.subho.lunchbooking.models.MealAvailableCountModel;
 import xyz.subho.lunchbooking.models.MealsModel;
 import xyz.subho.lunchbooking.services.MealsService;
 
@@ -96,5 +97,11 @@ public class MealsController {
   @GetMapping(EndpointPropertyKey.MEAL_AVAILABLE)
   public List<AvailableOptionsResponseModel> getAllAvailableMeals() {
     return mealsService.getAllAvailableOptionsForToday();
+  }
+
+  @GetMapping(EndpointPropertyKey.MEAL_COUNT)
+  @Secured({Roles.ROLE_MANAGER, Roles.ROLE_ADMINISTRATOR, Roles.ROLE_CATERER})
+  public MealAvailableCountModel getAllAvailableMeals(@PathVariable("mealId") long mealId) {
+    return mealsService.getMealCountByMealId(mealId);
   }
 }
