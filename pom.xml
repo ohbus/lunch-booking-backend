@@ -1,4 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Lunch Booking - Lunch Booking REST Application
+    Copyright © 2022 Subhrodip Mohanta (hello@subho.xyz)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
 <project
 	xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -7,7 +26,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.7.0</version>
+		<version>2.7.5</version>
 		<relativePath/>
 		<!-- lookup parent from repository -->
 	</parent>
@@ -16,19 +35,50 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Lunch Booking</name>
 	<description>Lunch Booking REST Application</description>
+	<inceptionYear>2022</inceptionYear>
+	<developers>
+		<developer>
+			<name>Subhrodip Mohanta</name>
+			<email>hello@subho.xyz</email>
+			<organization>Irdeto</organization>
+			<organizationUrl>https://irdeto.com</organizationUrl>
+			<timezone>Asia/Kolkata</timezone>
+		</developer>
+	</developers>
 	<properties>
-		<java.version>11</java.version>
+		<java.version>17</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spotless.plugin.version>2.8.1</spotless.plugin.version>
-		<google-java-format.version>1.9</google-java-format.version>
-		<license-maven-plugin.version>3.0</license-maven-plugin.version>
-		<jsonwebtoken.version>0.9.1</jsonwebtoken.version>
-		<jacoco.version>0.8.6</jacoco.version>
+		<spotless.plugin.version>2.23.0</spotless.plugin.version>
+		<google-java-format.version>1.15.0</google-java-format.version>
+		<license-maven-plugin.version>4.1</license-maven-plugin.version>
+		<auth0-jwt.version>4.2.1</auth0-jwt.version>
+		<commons-lang3.version>3.12.0</commons-lang3.version>
+		<zxing.version>3.5.0</zxing.version>
+		<jacoco.version>0.8.8</jacoco.version>
+		<sonar.projectKey>ohbus_lunch-booking-backend</sonar.projectKey>
+		<sonar.organization>ohbus</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
 	<dependencies>
+		<!-- https://mvnrepository.com/artifact/com.google.zxing/core -->
+		<dependency>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>core</artifactId>
+			<version>${zxing.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.google.zxing/javase -->
+		<dependency>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>javase</artifactId>
+			<version>${zxing.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -40,7 +90,15 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -52,6 +110,11 @@
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.auth0</groupId>
+			<artifactId>java-jwt</artifactId>
+			<version>${auth0-jwt.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>mysql</groupId>
@@ -69,10 +132,10 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-test</artifactId>
-			<scope>test</scope>
-		</dependency>
+	      <groupId>org.springframework.security</groupId>
+	      <artifactId>spring-security-test</artifactId>
+	      <scope>test</scope>
+	    </dependency>
 	</dependencies>
 	<build>
 		<plugins>
