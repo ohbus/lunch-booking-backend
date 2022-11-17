@@ -196,10 +196,11 @@ public class BookingServiceImpl implements BookingService {
                   today, mealOptionDay));
         }
         var user = userService.getUserById(userId);
-        var booking = new Bookings().withUser(user).withDate(mealOptionDay);
+        var booking =
+            new Bookings().withUser(user).withDate(mealOptionDay).withMealOptions(mealOption);
+        bookingRepository.save(booking);
         availableBooking.claim();
         mealOption.addBooking(booking);
-        bookingRepository.save(booking);
         log.debug(
             "Created New Booking with ID:{} for User ID:{} with Meal Option ID:{}",
             booking.getId(),
