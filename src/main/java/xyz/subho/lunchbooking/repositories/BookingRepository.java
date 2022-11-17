@@ -48,4 +48,10 @@ public interface BookingRepository extends JpaRepository<Bookings, Long> {
       @NonNull LocalDate date, @NonNull Long id);
 
   List<Bookings> findByDateAndCancelledAtNull(@NonNull LocalDate date);
+
+  int countByDateAndMealOptions_IdAndCancelledAtNullAndClaimedAtNotNull(
+      @NonNull LocalDate date, @NonNull Long id);
+
+  int countByDateAndMealOptions_IdAndCancelledAtNullAndClaimedAtNull(
+      @NonNull LocalDate date, @NonNull Long id);
 }

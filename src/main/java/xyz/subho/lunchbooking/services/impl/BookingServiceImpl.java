@@ -156,11 +156,13 @@ public class BookingServiceImpl implements BookingService {
       availableBookingOpt.get().add();
     } else {
       // If there is no available meal option, then creates one
-      var id = availableBookingsRepository.save(new AvailableBookings(date, mealOptions)).getId();
+      var availableBooking =
+          availableBookingsRepository.save(new AvailableBookings(date, mealOptions));
+      mealOptions.addAvailableBooking(availableBooking);
       log.debug(
           "No new meal options were present for Meal Option:{} Created NEW Avail ID:{}",
           mealOptions.getId(),
-          id);
+          availableBooking.getId());
     }
     log.debug("One more meal has been made available for Meal Option ID:{}", mealOptions.getId());
   }

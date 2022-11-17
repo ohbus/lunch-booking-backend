@@ -45,6 +45,7 @@ public final class EndpointPropertyKey {
   public static final String MEAL_FOR_USERS = "/meal";
   public static final String MEALS = "/meal/{today}";
   public static final String MEAL_AVAILABLE = "/meal/available";
+  public static final String MEAL_COUNT = "/meal/count/{mealId}";
 
   public static final String BOOKING_FOR_TODAY = "/booking";
   public static final String BOOKING_PICK_UP = "/booking/pickup/{mealOptionId}";
