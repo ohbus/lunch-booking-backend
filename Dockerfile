@@ -26,6 +26,23 @@ LABEL org.opencontainers.image.source="https://github.com/ohbus/lunch-booking-ba
 
 # If the container is launched with re-mapped ports, these 
 # ENV vars should be set to the remapped values.
+
+ENV ALLOWED_DOMAINS irdeto.com
+
+ENV CORS_URL https://lunch.subho.xyz
+
+ENV EMAIL_FROM_ADDR hello@subho.xyz
+
+ENV EMAIL_MANAGERS_TO_ADDR hello+manager@subho.xyz
+ENV EMAIL_MANAGER_CC_ADDR hello+manager+cc@subho.xyz
+
+ENV EMAIL_REPLY_TO_ADDR hello@subho.xyz
+ENV EMAIL_REPLY_TO_NAME Subhrodip Mohanta
+
+ENV KEYSTORE_PASSWORD Subh0@123
+ENV KEYSTORE_ALIAS subhrodip
+ENV KEYSTORE_PASSPHRASE Subh0@123
+
 ENV MYSQL_DB_HOST db
 ENV MYSQL_DB_PORT 3306
 ENV MYSQL_DB_UNAME root
@@ -33,19 +50,9 @@ ENV MYSQL_DB_PASSWD root
 
 ENV SMTP_UNAME username
 ENV SMTP_PASSWD password
+ENV SMTP_URL smtp.gmail.com
+ENV SMTP_PORT 587
 
-ENV EMAIL_FROM_ADDR hello@subho.xyz
-ENV EMAIL_REPLY_TO_ADDR hello@subho.xyz
-ENV EMAIL_REPLY_TO_NAME Subhrodip Mohanta
-ENV EMAIL_MANAGERS_TO_ADDR hello+manager@subho.xyz
-ENV EMAIL_MANAGER_CC_ADDR hello+manager+cc@subho.xyz
-
-ENV KEYSTORE_PASSWORD Subh0@123
-ENV KEYSTORE_ALIAS subhrodip
-ENV KEYSTORE_PASSPHRASE Subh0@123
-ENV CORS_URL https://lunch.subho.xyz
-
-ENV ALLOWED_DOMAINS irdeto.com
 
 ARG JAR_FILE=target/*.jar
 
