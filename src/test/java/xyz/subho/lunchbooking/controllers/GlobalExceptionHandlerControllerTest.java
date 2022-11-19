@@ -35,11 +35,9 @@ class GlobalExceptionHandlerControllerTest {
     void testHandleAsBadRequest2() {
         // TODO: Complete this test.
         //   Reason: R013 No inputs found that don't throw a trivial exception.
-        //   Diffblue Cover tried to run the arrange/act section, but the method under
         //   test threw
         //   java.lang.NullPointerException: Cannot invoke "java.lang.RuntimeException.getMessage()" because "ex" is null
         //       at xyz.subho.lunchbooking.controllers.GlobalExceptionHandlerController.handleAsBadRequest(GlobalExceptionHandlerController.java:46)
-        //   See https://diff.blue/R013 to resolve this issue.
 
         (new GlobalExceptionHandlerController()).handleAsBadRequest(null);
     }
@@ -66,11 +64,9 @@ class GlobalExceptionHandlerControllerTest {
     void testHandleAsAccessDenied2() {
         // TODO: Complete this test.
         //   Reason: R013 No inputs found that don't throw a trivial exception.
-        //   Diffblue Cover tried to run the arrange/act section, but the method under
         //   test threw
         //   java.lang.NullPointerException: Cannot invoke "java.lang.RuntimeException.getMessage()" because "ex" is null
         //       at xyz.subho.lunchbooking.controllers.GlobalExceptionHandlerController.handleAsAccessDenied(GlobalExceptionHandlerController.java:55)
-        //   See https://diff.blue/R013 to resolve this issue.
 
         (new GlobalExceptionHandlerController()).handleAsAccessDenied(null);
     }
@@ -97,11 +93,9 @@ class GlobalExceptionHandlerControllerTest {
     void testHandleAsNotFound2() {
         // TODO: Complete this test.
         //   Reason: R013 No inputs found that don't throw a trivial exception.
-        //   Diffblue Cover tried to run the arrange/act section, but the method under
         //   test threw
         //   java.lang.NullPointerException: Cannot invoke "java.lang.RuntimeException.getMessage()" because "ex" is null
         //       at xyz.subho.lunchbooking.controllers.GlobalExceptionHandlerController.handleAsNotFound(GlobalExceptionHandlerController.java:71)
-        //   See https://diff.blue/R013 to resolve this issue.
 
         (new GlobalExceptionHandlerController()).handleAsNotFound(null);
     }
@@ -128,11 +122,9 @@ class GlobalExceptionHandlerControllerTest {
     void testHandleAsBadUnauthorized2() {
         // TODO: Complete this test.
         //   Reason: R013 No inputs found that don't throw a trivial exception.
-        //   Diffblue Cover tried to run the arrange/act section, but the method under
         //   test threw
         //   java.lang.NullPointerException: Cannot invoke "java.lang.RuntimeException.getMessage()" because "ex" is null
         //       at xyz.subho.lunchbooking.controllers.GlobalExceptionHandlerController.handleAsBadUnauthorized(GlobalExceptionHandlerController.java:88)
-        //   See https://diff.blue/R013 to resolve this issue.
 
         (new GlobalExceptionHandlerController()).handleAsBadUnauthorized(null);
     }
@@ -160,11 +152,9 @@ class GlobalExceptionHandlerControllerTest {
     void testHandleAsMethodArgumentNotValid2() {
         // TODO: Complete this test.
         //   Reason: R013 No inputs found that don't throw a trivial exception.
-        //   Diffblue Cover tried to run the arrange/act section, but the method under
         //   test threw
         //   java.lang.NullPointerException: Cannot invoke "org.springframework.web.bind.MethodArgumentNotValidException.getBindingResult()" because "ex" is null
         //       at xyz.subho.lunchbooking.controllers.GlobalExceptionHandlerController.handleAsMethodArgumentNotValid(GlobalExceptionHandlerController.java:97)
-        //   See https://diff.blue/R013 to resolve this issue.
 
         (new GlobalExceptionHandlerController()).handleAsMethodArgumentNotValid(null);
     }
@@ -191,11 +181,9 @@ class GlobalExceptionHandlerControllerTest {
     void testHandleAsUnpronounceableEntity2() {
         // TODO: Complete this test.
         //   Reason: R013 No inputs found that don't throw a trivial exception.
-        //   Diffblue Cover tried to run the arrange/act section, but the method under
         //   test threw
         //   java.lang.NullPointerException: Cannot invoke "java.lang.Exception.getMessage()" because "ex" is null
         //       at xyz.subho.lunchbooking.controllers.GlobalExceptionHandlerController.handleAsUnpronounceableEntity(GlobalExceptionHandlerController.java:108)
-        //   See https://diff.blue/R013 to resolve this issue.
 
         (new GlobalExceptionHandlerController()).handleAsUnpronounceableEntity(null);
     }
@@ -222,11 +210,9 @@ class GlobalExceptionHandlerControllerTest {
     void testHandleAsMediaTypeNotSupported2() {
         // TODO: Complete this test.
         //   Reason: R013 No inputs found that don't throw a trivial exception.
-        //   Diffblue Cover tried to run the arrange/act section, but the method under
         //   test threw
         //   java.lang.NullPointerException: Cannot invoke "java.lang.Exception.getMessage()" because "ex" is null
         //       at xyz.subho.lunchbooking.controllers.GlobalExceptionHandlerController.handleAsMediaTypeNotSupported(GlobalExceptionHandlerController.java:115)
-        //   See https://diff.blue/R013 to resolve this issue.
 
         (new GlobalExceptionHandlerController()).handleAsMediaTypeNotSupported(null);
     }
@@ -253,11 +239,9 @@ class GlobalExceptionHandlerControllerTest {
     void testHandleAsConflict2() {
         // TODO: Complete this test.
         //   Reason: R013 No inputs found that don't throw a trivial exception.
-        //   Diffblue Cover tried to run the arrange/act section, but the method under
         //   test threw
         //   java.lang.NullPointerException: Cannot invoke "java.lang.Exception.getMessage()" because "ex" is null
         //       at xyz.subho.lunchbooking.controllers.GlobalExceptionHandlerController.handleAsConflict(GlobalExceptionHandlerController.java:128)
-        //   See https://diff.blue/R013 to resolve this issue.
 
         (new GlobalExceptionHandlerController()).handleAsConflict(null);
     }
@@ -284,11 +268,9 @@ class GlobalExceptionHandlerControllerTest {
     void testHandleEverythingElse2() {
         // TODO: Complete this test.
         //   Reason: R013 No inputs found that don't throw a trivial exception.
-        //   Diffblue Cover tried to run the arrange/act section, but the method under
         //   test threw
         //   java.lang.NullPointerException: Cannot invoke "java.lang.Exception.getMessage()" because "ex" is null
         //       at xyz.subho.lunchbooking.controllers.GlobalExceptionHandlerController.handleEverythingElse(GlobalExceptionHandlerController.java:135)
-        //   See https://diff.blue/R013 to resolve this issue.
 
         (new GlobalExceptionHandlerController()).handleEverythingElse(null);
     }
