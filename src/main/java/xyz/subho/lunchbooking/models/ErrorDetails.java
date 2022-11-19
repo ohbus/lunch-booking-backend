@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package xyz.subho.lunchbooking.exceptions;
+package xyz.subho.lunchbooking.models;
 
 import java.io.Serializable;
 import lombok.Data;

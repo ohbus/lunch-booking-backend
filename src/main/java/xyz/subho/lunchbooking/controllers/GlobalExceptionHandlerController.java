@@ -33,6 +33,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import xyz.subho.lunchbooking.exceptions.*;
+import xyz.subho.lunchbooking.models.ErrorDetails;
 
 @RestControllerAdvice
 public class GlobalExceptionHandlerController {
