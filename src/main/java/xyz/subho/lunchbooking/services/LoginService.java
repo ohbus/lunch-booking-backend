@@ -21,7 +21,12 @@ package xyz.subho.lunchbooking.services;
 import org.springframework.lang.NonNull;
 import xyz.subho.lunchbooking.entities.UserMetadata;
 import xyz.subho.lunchbooking.entities.security.UserLogin;
-import xyz.subho.lunchbooking.models.*;
+import xyz.subho.lunchbooking.models.OtpModel;
+import xyz.subho.lunchbooking.models.OtpRequestModel;
+import xyz.subho.lunchbooking.models.UserChangePasswordRequestModel;
+import xyz.subho.lunchbooking.models.UserLoginRequestModel;
+import xyz.subho.lunchbooking.models.UserLoginResponseModel;
+import xyz.subho.lunchbooking.models.UserRegistrationModel;
 
 public interface LoginService {
 

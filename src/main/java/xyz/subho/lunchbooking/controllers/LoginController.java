@@ -25,9 +25,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import xyz.subho.lunchbooking.exceptions.InvalidUsernameException;
-import xyz.subho.lunchbooking.models.*;
+import xyz.subho.lunchbooking.models.ForgetPasswordUpdateRequestModel;
+import xyz.subho.lunchbooking.models.FoundResponseModel;
+import xyz.subho.lunchbooking.models.NewPasswordRequest;
+import xyz.subho.lunchbooking.models.OtpModel;
+import xyz.subho.lunchbooking.models.OtpRequestModel;
+import xyz.subho.lunchbooking.models.UserChangePasswordRequestModel;
+import xyz.subho.lunchbooking.models.UserLoginRequestModel;
+import xyz.subho.lunchbooking.models.UserLoginResponseModel;
+import xyz.subho.lunchbooking.models.UserRegistrationModel;
 import xyz.subho.lunchbooking.services.LoginService;
 
 @RestController
