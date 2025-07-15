@@ -23,7 +23,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 21
-          distribution: 'corretto'
+          distribution: 'microsoft'
           cache: 'maven'
 
       - name: Cache SonarCloud packages
@@ -93,7 +93,7 @@ jobs:
       uses: actions/setup-java@v4
       with:
         java-version: 21
-        distribution: 'corretto'
+        distribution: 'microsoft'
         cache: 'maven'
     
     - name: Check Code Formatting
