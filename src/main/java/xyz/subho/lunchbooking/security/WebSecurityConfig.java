@@ -48,7 +48,16 @@ public class WebSecurityConfig {
 
     httpSecurity
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-        .csrf(csrf -> csrf.disable())
+        .csrf(
+            csrf ->
+                csrf.ignoringRequestMatchers(
+                    EndpointPropertyKey.LOGIN_USER_REGISTRATION,
+                    EndpointPropertyKey.LOGIN_USER,
+                    EndpointPropertyKey.LOGIN_OTP_VALIDATE,
+                    EndpointPropertyKey.LOGIN_OTP_RESEND,
+                    EndpointPropertyKey.LOGIN_CHECK_USER_NAME,
+                    EndpointPropertyKey.LOGIN_CHECK_PHONE_NUMBER,
+                    EndpointPropertyKey.FORGET_PASSWORD))
         .authorizeHttpRequests(
             auth ->
                 auth.requestMatchers(
