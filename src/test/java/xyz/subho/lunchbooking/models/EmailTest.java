@@ -23,8 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
+import jakarta.activation.DataSource;
+import jakarta.activation.FileDataSource;
 import org.junit.jupiter.api.Test;
 
 class EmailTest {

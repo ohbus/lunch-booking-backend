@@ -18,11 +18,11 @@
 
 package xyz.subho.lunchbooking.services.impl;
 
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.validation.Valid;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

@@ -18,8 +18,8 @@
 
 package xyz.subho.lunchbooking.models;
 
+import jakarta.validation.constraints.NotBlank;
 import java.io.Serializable;
-import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

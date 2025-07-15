@@ -18,8 +18,8 @@
 
 package xyz.subho.lunchbooking.models;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 public record UserChangePasswordRequestModel(
     @NotBlank(message = "Current Password cannot be Blank")

@@ -18,8 +18,8 @@
 
 package xyz.subho.lunchbooking.controllers;
 
+import jakarta.validation.Valid;
 import java.security.Principal;
-import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

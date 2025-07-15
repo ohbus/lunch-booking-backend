@@ -18,7 +18,7 @@
 
 package xyz.subho.lunchbooking.util;
 
-import javax.mail.util.ByteArrayDataSource;
+import jakarta.mail.util.ByteArrayDataSource;
 import xyz.subho.lunchbooking.entities.Meals;
 import xyz.subho.lunchbooking.models.BookingResponseModel;
 import xyz.subho.lunchbooking.models.Email;

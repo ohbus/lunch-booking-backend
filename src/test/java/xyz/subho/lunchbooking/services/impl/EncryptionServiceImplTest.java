@@ -77,7 +77,7 @@ class EncryptionServiceImplTest {
     //   Reason: R013 No inputs found that don't throw a trivial exception.
     //   test threw
     //   java.lang.IllegalArgumentException: the salt parameter must not be empty
-    //       at javax.crypto.spec.PBEKeySpec.<init>(PBEKeySpec.java:119)
+    //       at jakarta.crypto.spec.PBEKeySpec.<init>(PBEKeySpec.java:119)
     //       at
     // xyz.subho.lunchbooking.services.impl.EncryptionServiceImpl.hash(EncryptionServiceImpl.java:50)
 

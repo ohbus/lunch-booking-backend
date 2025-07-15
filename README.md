@@ -35,8 +35,8 @@ Our comprehensive wiki is the central hub for all project documentation. It's th
 
 This project is built with a modern and robust technology stack:
 
-*   [Java 17](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
-*   [Spring Boot](https://spring.io/projects/spring-boot)
+*   [Java 21](https://www.oracle.com/java/technologies/javase/jdk21-archive-downloads.html)
+*   [Spring Boot 3.5.3](https://spring.io/projects/spring-boot)
 *   [Maven](https://maven.apache.org/)
 *   [MySQL](https://www.mysql.com/)
 *   [Docker](https://www.docker.com/)

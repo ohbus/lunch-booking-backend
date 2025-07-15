@@ -18,9 +18,9 @@
 
 package xyz.subho.lunchbooking.services.impl;
 
+import jakarta.transaction.Transactional;
 import java.util.Objects;
 import java.util.Set;
-import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

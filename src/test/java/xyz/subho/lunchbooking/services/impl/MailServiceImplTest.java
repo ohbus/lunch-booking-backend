@@ -24,9 +24,9 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import javax.activation.FileDataSource;
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
+import jakarta.activation.FileDataSource;
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

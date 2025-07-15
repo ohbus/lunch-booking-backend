@@ -18,9 +18,9 @@
 
 package xyz.subho.lunchbooking.models;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.io.Serializable;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 
 public record OtpRequestModel(
     @Min(value = 1, message = "Salt Cannot be less than 1") long salt,

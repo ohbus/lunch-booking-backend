@@ -18,17 +18,17 @@
 
 package xyz.subho.lunchbooking.controllers;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.security.Principal;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders;
-import org.springframework.test.context.ContextConfiguration;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -38,12 +38,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import xyz.subho.lunchbooking.models.BookingResponseModel;
 import xyz.subho.lunchbooking.services.BookingService;
 
-@ContextConfiguration(classes = {BookingController.class})
 @ExtendWith(SpringExtension.class)
 class BookingControllerTest {
-  @Autowired private BookingController bookingController;
+  @InjectMocks private BookingController bookingController;
 
-  @MockBean private BookingService bookingService;
+  @Mock private BookingService bookingService;
 
   /** Method under test: {@link BookingController#availBooking(long)} */
   @Test
@@ -66,39 +65,29 @@ class BookingControllerTest {
                         + "\":123,\"availedAt\":1}"));
   }
 
-  /** Method under test: {@link BookingController#availBooking(long)} */
-  @Test
-  void testAvailBooking2() throws Exception {
-    when(bookingService.availBooking(anyLong()))
-        .thenReturn(
-            new BookingResponseModel(
-                123L, "Jane", "Doe", LocalDate.ofEpochDay(1L), "Meal Option", 123L, 1L));
-    SecurityMockMvcRequestBuilders.FormLoginRequestBuilder requestBuilder =
-        SecurityMockMvcRequestBuilders.formLogin();
-    ResultActions actualPerformResult =
-        MockMvcBuilders.standaloneSetup(bookingController).build().perform(requestBuilder);
-    actualPerformResult.andExpect(MockMvcResultMatchers.status().isNotFound());
-  }
-
   /** Method under test: {@link BookingController#cancelBooking(long, Principal)} */
   @Test
   void testCancelBooking() throws Exception {
+    Principal principal = mock(Principal.class);
+    when(principal.getName()).thenReturn("123");
     MockHttpServletRequestBuilder requestBuilder =
-        MockMvcRequestBuilders.delete("/booking/{bookingId}", "Uri Variables", "Uri Variables");
+        MockMvcRequestBuilders.delete("/booking/{bookingId}", 123L).principal(principal);
     ResultActions actualPerformResult =
         MockMvcBuilders.standaloneSetup(bookingController).build().perform(requestBuilder);
-    actualPerformResult.andExpect(MockMvcResultMatchers.status().is(400));
+    actualPerformResult.andExpect(MockMvcResultMatchers.status().isNoContent());
   }
 
   /** Method under test: {@link BookingController#createBooking(long, Principal)} */
   @Test
   void testCreateBooking() throws Exception {
+    Principal principal = mock(Principal.class);
+    when(principal.getName()).thenReturn("123");
+    when(bookingService.createBooking(anyLong(), anyLong())).thenReturn(123L);
     MockHttpServletRequestBuilder requestBuilder =
-        MockMvcRequestBuilders.post(
-            "/booking/create/{mealOptionId}", "Uri Variables", "Uri Variables");
+        MockMvcRequestBuilders.post("/booking/create/{mealOptionId}", 123L).principal(principal);
     ResultActions actualPerformResult =
         MockMvcBuilders.standaloneSetup(bookingController).build().perform(requestBuilder);
-    actualPerformResult.andExpect(MockMvcResultMatchers.status().is(400));
+    actualPerformResult.andExpect(MockMvcResultMatchers.status().isCreated());
   }
 
   /**
@@ -106,31 +95,27 @@ class BookingControllerTest {
    */
   @Test
   void testCreateBookingFromAvailableOptions() throws Exception {
+    Principal principal = mock(Principal.class);
+    when(principal.getName()).thenReturn("123");
+    when(bookingService.claimAvailableMeal(anyLong(), anyLong())).thenReturn(123L);
     MockHttpServletRequestBuilder requestBuilder =
-        MockMvcRequestBuilders.put(
-            "/booking/pickup/{mealOptionId}", "Uri Variables", "Uri Variables");
+        MockMvcRequestBuilders.put("/booking/pickup/{mealOptionId}", 123L).principal(principal);
     ResultActions actualPerformResult =
         MockMvcBuilders.standaloneSetup(bookingController).build().perform(requestBuilder);
-    actualPerformResult.andExpect(MockMvcResultMatchers.status().is(400));
+    actualPerformResult.andExpect(MockMvcResultMatchers.status().isOk());
   }
 
   /** Method under test: {@link BookingController#getAllBookingsForDate(LocalDate)} */
   @Test
   void testGetAllBookingsForDate() throws Exception {
+    when(bookingService.getBookingsByDate(any())).thenReturn(new java.util.ArrayList<>());
     MockHttpServletRequestBuilder requestBuilder =
         MockMvcRequestBuilders.get("/booking/{date}", LocalDate.ofEpochDay(1L));
-    ResultActions actualPerformResult =
-        MockMvcBuilders.standaloneSetup(bookingController).build().perform(requestBuilder);
-    actualPerformResult.andExpect(MockMvcResultMatchers.status().is(400));
-  }
-
-  /** Method under test: {@link BookingController#getTodayBookingForUser(Principal)} */
-  @Test
-  void testGetTodayBookingForUser() throws Exception {
-    SecurityMockMvcRequestBuilders.FormLoginRequestBuilder requestBuilder =
-        SecurityMockMvcRequestBuilders.formLogin();
-    ResultActions actualPerformResult =
-        MockMvcBuilders.standaloneSetup(bookingController).build().perform(requestBuilder);
-    actualPerformResult.andExpect(MockMvcResultMatchers.status().isNotFound());
+    MockMvcBuilders.standaloneSetup(bookingController)
+        .build()
+        .perform(requestBuilder)
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+        .andExpect(MockMvcResultMatchers.content().string("[]"));
   }
 }

@@ -18,7 +18,7 @@
 
 package xyz.subho.lunchbooking.models;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 public record ForgetPasswordUpdateRequestModel(
     @NotBlank(message = "Username field cannot be blank") String username) {}

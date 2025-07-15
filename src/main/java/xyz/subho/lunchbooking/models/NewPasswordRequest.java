@@ -18,8 +18,8 @@
 
 package xyz.subho.lunchbooking.models;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 public record NewPasswordRequest(
     @NotBlank(message = "Password field cannot be blank")

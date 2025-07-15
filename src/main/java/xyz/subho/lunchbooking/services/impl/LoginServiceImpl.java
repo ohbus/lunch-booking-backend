@@ -19,11 +19,11 @@
 package xyz.subho.lunchbooking.services.impl;
 
 import io.micrometer.core.instrument.util.StringUtils;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import javax.transaction.Transactional;
-import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

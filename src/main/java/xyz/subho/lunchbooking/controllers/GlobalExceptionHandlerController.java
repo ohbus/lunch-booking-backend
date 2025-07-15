@@ -18,11 +18,11 @@
 
 package xyz.subho.lunchbooking.controllers;
 
-import com.nimbusds.jose.shaded.json.JSONObject;
-import com.nimbusds.jose.shaded.json.JSONStyle;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.ValidationException;
 import java.util.HashMap;
 import java.util.Map;
-import javax.validation.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -118,8 +118,12 @@ public class GlobalExceptionHandlerController {
     ex.getBindingResult()
         .getFieldErrors()
         .forEach(fieldError -> errorMap.put(fieldError.getField(), fieldError.getDefaultMessage()));
-    ErrorDetails errorDetails =
-        new ErrorDetails(new JSONObject(errorMap).toJSONString(JSONStyle.MAX_COMPRESS));
+    ErrorDetails errorDetails;
+    try {
+      errorDetails = new ErrorDetails(new ObjectMapper().writeValueAsString(errorMap));
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
     return new ResponseEntity<>(errorDetails, HttpStatus.UNPROCESSABLE_ENTITY);
   }
 

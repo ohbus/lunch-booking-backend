@@ -26,17 +26,18 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Set up JDK 17
+    - name: Set up JDK 21
       uses: actions/setup-java@v4
       with:
-        java-version: 17
+        java-version: 21
         distribution: 'corretto'
-        cache: 'maven'
+        cache: 'gradle'
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
+        build-mode: gradle
 
     - name: Autobuild
       uses: github/codeql-action/autobuild@v3
