@@ -62,7 +62,7 @@ jobs:
     name: Check Code Formatting
     strategy:
       matrix:
-        platform: [ ubuntu-latest , macos-latest , windows-latest ]
+        platform: [ ubuntu-latest , macos-15 , windows-latest ]
     runs-on: ${{ matrix.platform }}
     steps:
     - name: Checkout Code
