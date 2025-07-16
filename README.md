@@ -76,7 +76,13 @@ The application will then be available at `http://localhost:8080`. For details o
 
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
-For more details on how to contribute, please see our **[Contributing Guidelines](https://github.com/ohbus/lunch-booking-backend/wiki/Contributing)** in the wiki.
+[**Wiki**](https://github.com/ohbus/lunch-booking-backend/wiki) is the best place to start contributing. You can help us by:
+* **Improving Documentation**: If you find any part of the documentation unclear or missing, feel free to edit the wiki pages.
+* **Adding Features**: If you have an idea for a new feature, please check the existing issues to see if it's already being worked on. If not, you can propose it in the wiki or open a new issue.
+* **Fixing Bugs**: If you find a bug, please report it in the issues section. If you can fix it, feel free to submit a pull request.
+* **Code Quality**: Help us maintain high code quality by reviewing pull requests and suggesting improvements.
+* **Testing**: Write tests for new features or improve existing tests to ensure the application remains stable.
+* **Security**: If you find a security vulnerability, please report it privately to us via email at [
 
 You can also simply open an issue with the tag "enhancement".
 Don't forget to give the project a star! Thanks again!
