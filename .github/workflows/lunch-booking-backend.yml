@@ -2,12 +2,13 @@ name: Maven CI
 
 on:
   push:
-    branches: master
+    branches:
+      - '**'
 
 jobs:
 
   analyse-and-build:
-
+    if: github.ref == 'refs/heads/master'
     name: Build
     needs: check-code-formatting
     
@@ -37,7 +38,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+        run: mvn -B clean verify -Pfrontend org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -100,3 +101,20 @@ jobs:
       run: |
         mvn -e spotless:check
         echo "Run the command 'mvn spotless:apply' to fix Java formatting if this job fails or Build with Maven"
+
+  maven-build-only:
+    if: github.ref != 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: 'microsoft'
+          cache: 'maven'
+      - name: Build with Maven
+        run: mvn -B clean install -Pfrontend
