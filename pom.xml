@@ -51,7 +51,7 @@
         <google-java-format.version>1.28.0</google-java-format.version>
         <license-maven-plugin.version>5.0.0</license-maven-plugin.version>
         <auth0-jwt.version>4.5.0</auth0-jwt.version>
-        <zxing.version>3.5.3</zxing.version>
+        <zxing.version>3.5.4</zxing.version>
         <jacoco.version>0.8.13</jacoco.version>
         <sonar.projectKey>ohbus_lunch-booking-backend</sonar.projectKey>
         <sonar.organization>ohbus</sonar.organization>
